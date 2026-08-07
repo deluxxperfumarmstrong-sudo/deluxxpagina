@@ -40,16 +40,16 @@ export default function MenuMovil() {
         aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={abierto}
         onClick={() => setAbierto((v) => !v)}
-        className="relative z-50 flex flex-col gap-1.5 w-6 p-1"
+        className="relative z-50 -ml-2.5 flex w-11 h-11 flex-col items-center justify-center gap-1.5"
       >
         <span
-          className={`block h-0.5 bg-on-background transition-transform ${
+          className={`block h-0.5 w-6 bg-on-background transition-transform ${
             abierto ? "translate-y-2 rotate-45" : ""
           }`}
         />
-        <span className={`block h-0.5 bg-on-background transition-opacity ${abierto ? "opacity-0" : ""}`} />
+        <span className={`block h-0.5 w-6 bg-on-background transition-opacity ${abierto ? "opacity-0" : ""}`} />
         <span
-          className={`block h-0.5 bg-on-background transition-transform ${
+          className={`block h-0.5 w-6 bg-on-background transition-transform ${
             abierto ? "-translate-y-2 -rotate-45" : ""
           }`}
         />
@@ -66,7 +66,7 @@ export default function MenuMovil() {
       <nav
         inert={!abierto}
         aria-hidden={!abierto}
-        className={`absolute left-0 right-0 top-full z-40 bg-background border-b border-border-subtle px-6 py-6 flex flex-col gap-5 origin-top transition-[opacity,transform] duration-200 ease-out ${
+        className={`absolute left-0 right-0 top-full z-40 bg-background border-b border-border-subtle px-4 py-2 flex flex-col origin-top transition-[opacity,transform] duration-200 ease-out ${
           abierto
             ? "opacity-100 scale-y-100 pointer-events-auto"
             : "opacity-0 scale-y-95 pointer-events-none"
@@ -80,7 +80,7 @@ export default function MenuMovil() {
               href={link.href}
               onClick={() => setAbierto(false)}
               aria-current={activo ? "page" : undefined}
-              className={`font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide transition-colors hover:text-accent ${
+              className={`flex items-center min-h-11 py-2.5 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide transition-colors hover:text-accent ${
                 activo ? "text-accent-text" : "text-on-background"
               }`}
             >

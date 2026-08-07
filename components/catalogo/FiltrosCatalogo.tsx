@@ -31,7 +31,7 @@ export default function FiltrosCatalogo({
       {mostrarCategoria && (
         <select
           aria-label="Filtrar por categoría"
-          className="bg-surface border border-border text-on-surface text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
+          className="bg-surface border border-border text-on-surface text-base sm:text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
           value={searchParams.get("categoria") ?? ""}
           onChange={(e) => actualizar("categoria", e.target.value)}
         >
@@ -46,7 +46,7 @@ export default function FiltrosCatalogo({
 
       <select
         aria-label="Filtrar por tipo"
-        className="bg-surface border border-border text-on-surface text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
+        className="bg-surface border border-border text-on-surface text-base sm:text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
         value={searchParams.get("tipo") ?? ""}
         onChange={(e) => actualizar("tipo", e.target.value)}
       >
@@ -57,7 +57,7 @@ export default function FiltrosCatalogo({
 
       <select
         aria-label="Filtrar por tamaño en mililitros"
-        className="bg-surface border border-border text-on-surface text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
+        className="bg-surface border border-border text-on-surface text-base sm:text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
         value={searchParams.get("ml") ?? ""}
         onChange={(e) => actualizar("ml", e.target.value)}
       >
@@ -71,7 +71,7 @@ export default function FiltrosCatalogo({
 
       <select
         aria-label="Ordenar por"
-        className="bg-surface border border-border text-on-surface text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
+        className="bg-surface border border-border text-on-surface text-base sm:text-sm px-4 py-3 rounded-none focus-visible:outline-accent"
         value={searchParams.get("orden") ?? ""}
         onChange={(e) => actualizar("orden", e.target.value)}
       >

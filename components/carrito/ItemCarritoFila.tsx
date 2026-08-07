@@ -59,7 +59,7 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
           type="button"
           aria-label={`Quitar ${item.nombre} del carrito`}
           onClick={() => quitarItem(item.productoSlug, item.ml)}
-          className="text-on-surface-muted hover:text-error text-sm font-semibold transition-colors"
+          className="flex items-center min-h-11 -my-2 px-1 -mr-1 text-on-surface-muted hover:text-error text-sm font-semibold transition-colors"
         >
           Quitar
         </button>

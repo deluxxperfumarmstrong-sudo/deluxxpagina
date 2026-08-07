@@ -17,7 +17,7 @@ export default function CarritoBadge() {
   return (
     <Link
       href="/carrito"
-      className="relative font-body-emphasis text-sm uppercase tracking-wide text-on-background hover:text-accent transition-colors"
+      className="relative flex items-center min-h-11 -mr-1 py-2 font-body-emphasis text-sm uppercase tracking-wide text-on-background hover:text-accent transition-colors"
     >
       Carrito
       {montado && cantidadItems > 0 && (

@@ -22,7 +22,7 @@ export default function MlSelector({
               role="radio"
               aria-checked={activo}
               onClick={() => onSeleccionar(ml)}
-              className={`px-4 py-2 text-sm border transition-colors ${
+              className={`min-h-11 px-4 py-2 text-sm border transition-colors ${
                 activo
                   ? "border-primary bg-primary text-on-primary"
                   : "border-border text-on-surface hover:border-primary"

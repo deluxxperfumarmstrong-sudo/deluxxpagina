@@ -9,7 +9,7 @@ export default function ResumenCarrito({ items }: { items: ItemCarrito[] }) {
   const link = generarLinkWhatsApp(items);
 
   return (
-    <div className="bg-surface p-6 flex flex-col gap-5">
+    <div className="bg-surface p-4 sm:p-6 flex flex-col gap-5">
       <h2 className="font-display text-xl text-on-surface">Resumen</h2>
 
       <div className="flex flex-col gap-2 text-sm">
@@ -33,7 +33,7 @@ export default function ResumenCarrito({ items }: { items: ItemCarrito[] }) {
         href={link}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-center bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 hover:bg-[#E8E8E8] transition-colors"
+        className="text-center bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
       >
         Cerrar pedido por WhatsApp
       </a>
