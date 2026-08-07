@@ -57,7 +57,7 @@ export default function QuienesSomosPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 md:mb-14">
         {VALORES.map((v, i) => (
           <Reveal key={v.titulo} delayMs={i * 90} className="bg-surface rounded-sm p-6 flex flex-col gap-4">
-            <div className="w-12 h-12 rounded-full bg-surface-raised flex items-center justify-center text-accent">
+            <div className="w-12 h-12 rounded-sm bg-surface-raised flex items-center justify-center text-accent">
               <v.icono className="w-6 h-6" />
             </div>
             <h2 className="font-display text-xl text-on-background">{v.titulo}</h2>

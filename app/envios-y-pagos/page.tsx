@@ -30,7 +30,7 @@ export default function EnviosYPagosPage() {
         {/* Envíos */}
         <Reveal as="section" className="bg-surface rounded-sm p-6 md:p-8 flex flex-col gap-6">
           <div className="flex items-center gap-4">
-            <div className="shrink-0 w-14 h-14 rounded-full bg-surface-raised flex items-center justify-center text-accent">
+            <div className="shrink-0 w-14 h-14 rounded-sm bg-surface-raised flex items-center justify-center text-accent">
               <IconoCamion className="w-7 h-7" />
             </div>
             <h2 className="font-display text-2xl text-on-background">Envíos</h2>
@@ -65,7 +65,7 @@ export default function EnviosYPagosPage() {
           className="bg-surface rounded-sm p-6 md:p-8 flex flex-col gap-6"
         >
           <div className="flex items-center gap-4">
-            <div className="shrink-0 w-14 h-14 rounded-full bg-surface-raised flex items-center justify-center text-accent">
+            <div className="shrink-0 w-14 h-14 rounded-sm bg-surface-raised flex items-center justify-center text-accent">
               <IconoBillete className="w-7 h-7" />
             </div>
             <h2 className="font-display text-2xl text-on-background">Pagos</h2>
