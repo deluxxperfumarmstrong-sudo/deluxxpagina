@@ -74,7 +74,7 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
             type="button"
             aria-label="Restar cantidad"
             onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-            className="w-10 h-12 text-on-surface hover:text-accent"
+            className="w-11 h-12 text-on-surface hover:text-accent"
           >
             −
           </button>
@@ -85,7 +85,7 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
             type="button"
             aria-label="Sumar cantidad"
             onClick={() => setCantidad((c) => c + 1)}
-            className="w-10 h-12 text-on-surface hover:text-accent"
+            className="w-11 h-12 text-on-surface hover:text-accent"
           >
             +
           </button>

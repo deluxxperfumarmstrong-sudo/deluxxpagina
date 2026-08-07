@@ -36,16 +36,16 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
             type="button"
             aria-label="Restar cantidad"
             onClick={() => actualizarCantidad(item.productoSlug, item.ml, item.cantidad - 1)}
-            className="w-8 h-10 text-on-surface hover:text-accent"
+            className="w-11 h-11 text-on-surface hover:text-accent"
           >
             −
           </button>
-          <span className="w-8 text-center text-sm text-on-surface">{item.cantidad}</span>
+          <span className="w-8 text-center text-sm text-on-surface" aria-live="polite">{item.cantidad}</span>
           <button
             type="button"
             aria-label="Sumar cantidad"
             onClick={() => actualizarCantidad(item.productoSlug, item.ml, item.cantidad + 1)}
-            className="w-8 h-10 text-on-surface hover:text-accent"
+            className="w-11 h-11 text-on-surface hover:text-accent"
           >
             +
           </button>
