@@ -34,9 +34,6 @@ const VALORES = [
 export default function QuienesSomosPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 md:px-12 py-12 md:py-16">
-      <p className="text-caption uppercase tracking-widest text-accent mb-3">
-        Deluxx Perfum
-      </p>
       <h1 className="font-display text-4xl md:text-5xl text-on-background mb-8 max-w-2xl">
         Perfumería para quien no se conforma con lo genérico
       </h1>

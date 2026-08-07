@@ -19,9 +19,6 @@ const NOTA_METODO: Record<string, string> = {
 export default function EnviosYPagosPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 md:px-12 py-12 md:py-16">
-      <p className="text-caption uppercase tracking-widest text-accent mb-3">
-        Cómo comprar
-      </p>
       <h1 className="font-display text-4xl md:text-5xl text-on-background mb-12 md:mb-16">
         Envíos y pagos
       </h1>

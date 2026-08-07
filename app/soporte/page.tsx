@@ -44,7 +44,6 @@ const PREGUNTAS: PreguntaFrecuente[] = [
 export default function SoportePage() {
   return (
     <div className="mx-auto max-w-3xl px-6 md:px-12 py-12 md:py-16">
-      <p className="text-caption uppercase tracking-widest text-accent mb-3">Ayuda</p>
       <h1 className="font-display text-4xl md:text-5xl text-on-background mb-4">Soporte</h1>
       <p className="text-on-surface-muted mb-10 max-w-lg">
         Las dudas más comunes antes de pedir. Si no encontrás lo que buscás, escribinos
