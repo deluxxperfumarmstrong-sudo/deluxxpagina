@@ -17,7 +17,7 @@ export default function MuestrasPage() {
       </p>
       <p className="text-on-surface leading-relaxed mb-4">
         Los productos con muestra disponible tienen el badge{" "}
-        <span className="inline-block bg-surface-raised text-accent text-xs uppercase tracking-wide rounded-full px-3 py-1 border border-accent align-middle">
+        <span className="inline-block bg-surface-raised text-accent-text text-xs uppercase tracking-wide rounded-full px-3 py-1 border border-accent-text align-middle">
           Muestra disponible
         </span>{" "}
         en el catálogo y en su ficha.

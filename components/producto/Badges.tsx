@@ -10,7 +10,7 @@ export function BadgeTipo({ tipo }: { tipo: TipoProducto }) {
 
 export function BadgeMuestra() {
   return (
-    <span className="inline-block bg-surface-raised text-accent text-xs uppercase tracking-wide rounded-full px-3 py-1 border border-accent">
+    <span className="inline-block bg-surface-raised text-accent-text text-xs uppercase tracking-wide rounded-full px-3 py-1 border border-accent-text">
       Muestra disponible
     </span>
   );

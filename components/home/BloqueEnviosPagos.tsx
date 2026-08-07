@@ -34,7 +34,7 @@ export default function BloqueEnviosPagos() {
         </Reveal>
       </div>
       <div className="mt-6">
-        <Link href="/envios-y-pagos" className="text-sm text-accent hover:underline">
+        <Link href="/envios-y-pagos" className="text-sm text-accent-text hover:underline">
           Ver todos los detalles →
         </Link>
       </div>

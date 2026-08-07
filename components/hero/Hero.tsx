@@ -32,7 +32,7 @@ export default function Hero() {
             </Link>
             <Link
               href="/muestras"
-              className="whitespace-nowrap border border-accent text-accent font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent transition-colors"
+              className="whitespace-nowrap border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
             >
               Pedir muestra
             </Link>

@@ -70,7 +70,7 @@ export default function QuienesSomosPage() {
         <p className="text-on-surface">¿Tenés dudas antes de pedir? Estamos para ayudarte.</p>
         <Link
           href="/soporte"
-          className="shrink-0 border border-accent text-accent font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent transition-colors"
+          className="shrink-0 border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
         >
           Ir a soporte
         </Link>

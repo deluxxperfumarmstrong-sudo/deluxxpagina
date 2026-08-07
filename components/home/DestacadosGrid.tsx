@@ -10,7 +10,7 @@ export default function DestacadosGrid({ productos }: { productos: Producto[] })
     <section className="mx-auto max-w-7xl px-6 md:px-12 py-10 md:py-14">
       <div className="flex items-end justify-between mb-6">
         <h2 className="font-display text-3xl md:text-4xl text-on-background">Destacados</h2>
-        <Link href="/catalogo" className="text-sm text-accent hover:underline">
+        <Link href="/catalogo" className="text-sm text-accent-text hover:underline">
           Ver todo el catálogo →
         </Link>
       </div>

@@ -24,7 +24,7 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
           {item.tipo === "ENCARGO" ? "Por encargo" : "En stock"}
         </p>
         {item.tieneSena && (
-          <p className="text-xs text-accent mt-1">
+          <p className="text-xs text-accent-text mt-1">
             Seña: {formatoPrecio(item.senaUnitaria * item.cantidad)}
           </p>
         )}

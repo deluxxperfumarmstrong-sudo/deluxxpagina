@@ -46,7 +46,7 @@ export default async function AdminCategoriasPage() {
                     type="submit"
                     className={`border text-sm font-semibold px-4 py-2 transition-colors ${
                       cat.activa
-                        ? "border-error text-error hover:bg-error hover:text-on-accent"
+                        ? "border-accent-text text-accent-text hover:bg-error hover:border-error hover:text-on-accent"
                         : "border-success text-success hover:bg-success hover:text-on-accent"
                     }`}
                   >

@@ -18,7 +18,7 @@ export default function ResumenCarrito({ items }: { items: ItemCarrito[] }) {
           <span>{formatoPrecio(subtotal)}</span>
         </div>
         {senaTotal > 0 && (
-          <div className="flex justify-between text-accent font-semibold">
+          <div className="flex justify-between text-accent-text font-semibold">
             <span>Seña total a abonar</span>
             <span>{formatoPrecio(senaTotal)}</span>
           </div>
