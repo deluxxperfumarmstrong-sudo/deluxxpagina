@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deluxx Perfum — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --color-background:#3A3A3D;
+    --color-surface:#2A2A2C;
+    --color-surface-raised:#232325;
+    --color-surface-metallic:#55555A;
+    --color-on-background:#F5F5F5;
+    --color-on-surface:#EDEDED;
+    --color-on-surface-muted:#C4C4C8;
+    --color-border:#55555A;
+    --color-border-subtle:#48484C;
+    --color-primary:#FFFFFF;
+    --color-on-primary:#0A0A0A;
+    --color-accent:#D42328;
+    --color-accent-hover:#B81C21;
+    --color-on-accent:#FFFFFF;
+    --color-success:#3EA05B;
+    --color-warning:#D6A527;
+    --color-error:#D42328;
+    --color-info:#5A8CC2;
+
+    --type-display-family:'Anton','Archivo Black',sans-serif;
+    --type-display-size:4rem;
+    --type-display-weight:700;
+    --type-display-lh:0.95;
+    --type-display-ls:-0.01em;
+
+    --type-h1-family:'Anton','Archivo Black',sans-serif;
+    --type-h1-size:2.75rem;
+    --type-h1-weight:700;
+    --type-h1-lh:1;
+
+    --type-h2-family:'Anton','Archivo Black',sans-serif;
+    --type-h2-size:2rem;
+    --type-h2-weight:700;
+    --type-h2-lh:1.05;
+
+    --type-h3-family:'Archivo',sans-serif;
+    --type-h3-size:1.375rem;
+    --type-h3-weight:700;
+    --type-h3-lh:1.2;
+    --type-h3-ls:0.01em;
+
+    --type-body-family:'Archivo',sans-serif;
+    --type-body-size:1rem;
+    --type-body-weight:400;
+    --type-body-lh:1.6;
+
+    --type-body-emphasis-weight:600;
+
+    --type-caption-size:0.8125rem;
+    --type-caption-weight:500;
+    --type-caption-lh:1.4;
+    --type-caption-ls:0.03em;
+
+    --type-label-outline-size:1rem;
+    --type-label-outline-weight:700;
+    --type-label-outline-ls:0.08em;
+
+    --rounded-none:0px;
+    --rounded-sm:2px;
+    --rounded-md:4px;
+    --rounded-full:999px;
+
+    --space-1:4px;
+    --space-2:8px;
+    --space-3:16px;
+    --space-4:24px;
+    --space-5:32px;
+    --space-6:48px;
+    --space-7:64px;
+    --space-8:96px;
+    --space-9:128px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--color-background);
+    color:var(--color-on-background);
+    font-family:var(--type-body-family);
+    font-size:var(--type-body-size);
+    line-height:var(--type-body-lh);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  .wrap{max-width:1100px;margin:0 auto;padding:var(--space-6) var(--space-4) var(--space-9);}
+
+  header.hero{
+    padding:var(--space-8) var(--space-4) var(--space-6);
+    background:linear-gradient(135deg,#000000 0%,#2b2b2d 55%,#4a4a4d 100%);
+    border-bottom:1px solid var(--color-border);
+    text-align:center;
+  }
+  header.hero .word{
+    font-family:var(--type-display-family);
+    font-size:var(--type-display-size);
+    font-weight:var(--type-display-weight);
+    line-height:var(--type-display-lh);
+    letter-spacing:var(--type-display-ls);
+    color:var(--color-primary);
+    text-transform:uppercase;
+    margin:0;
+  }
+  header.hero .sub{
+    display:inline-block;
+    margin-top:var(--space-2);
+    font-family:var(--type-label-outline-size ? 'Archivo',sans-serif: inherit);
+    font-size:var(--type-label-outline-size);
+    font-weight:var(--type-label-outline-weight);
+    letter-spacing:var(--type-label-outline-ls);
+    text-transform:uppercase;
+    color:transparent;
+    -webkit-text-stroke:1.5px var(--color-accent);
+  }
+  header.hero p.desc{
+    color:var(--color-on-surface-muted);
+    max-width:520px;
+    margin:var(--space-4) auto 0;
+  }
+  header.hero .mirror-note{
+    margin-top:var(--space-3);
+    font-size:var(--type-caption-size);
+    color:var(--color-on-surface-muted);
+    letter-spacing:var(--type-caption-ls);
+    text-transform:uppercase;
+  }
+
+  section{padding-top:var(--space-8);}
+  section h2.section-title{
+    font-family:var(--type-h2-family);
+    font-size:var(--type-h2-size);
+    font-weight:var(--type-h2-weight);
+    line-height:var(--type-h2-lh);
+    text-transform:uppercase;
+    margin:0 0 var(--space-5);
+    padding-bottom:var(--space-3);
+    border-bottom:1px solid var(--color-border-subtle);
+  }
+
+  /* Colors */
+  .swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--space-3);}
+  .swatch{
+    border:1px solid var(--color-border-subtle);
+    border-radius:var(--rounded-sm);
+    overflow:hidden;
+    background:var(--color-surface);
+  }
+  .swatch .block{height:88px;display:flex;align-items:flex-end;padding:var(--space-2);}
+  .swatch .block span{font-size:var(--type-caption-size);font-weight:600;}
+  .swatch .meta{padding:var(--space-2) var(--space-3);}
+  .swatch .meta .name{font-weight:600;font-size:0.9rem;}
+  .swatch .meta .hex{color:var(--color-on-surface-muted);font-size:0.8rem;font-family:monospace;}
+
+  /* Typography */
+  .type-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    gap:var(--space-4);
+    padding:var(--space-4) 0;
+    border-bottom:1px solid var(--color-border-subtle);
+    flex-wrap:wrap;
+  }
+  .type-row .spec{
+    color:var(--color-on-surface-muted);
+    font-size:0.8rem;
+    font-family:monospace;
+    white-space:nowrap;
+  }
+  .t-display{font-family:var(--type-display-family);font-size:var(--type-display-size);font-weight:var(--type-display-weight);line-height:var(--type-display-lh);letter-spacing:var(--type-display-ls);text-transform:uppercase;}
+  .t-h1{font-family:var(--type-h1-family);font-size:var(--type-h1-size);font-weight:var(--type-h1-weight);line-height:var(--type-h1-lh);text-transform:uppercase;}
+  .t-h2{font-family:var(--type-h2-family);font-size:var(--type-h2-size);font-weight:var(--type-h2-weight);text-transform:uppercase;}
+  .t-h3{font-family:var(--type-h3-family);font-size:var(--type-h3-size);font-weight:var(--type-h3-weight);letter-spacing:var(--type-h3-ls);}
+  .t-body{font-family:var(--type-body-family);font-size:var(--type-body-size);font-weight:var(--type-body-weight);}
+  .t-body-em{font-family:var(--type-body-family);font-size:var(--type-body-size);font-weight:var(--type-body-emphasis-weight);}
+  .t-caption{font-size:var(--type-caption-size);font-weight:var(--type-caption-weight);letter-spacing:var(--type-caption-ls);text-transform:uppercase;color:var(--color-on-surface-muted);}
+  .t-label-outline{font-size:var(--type-label-outline-size);font-weight:var(--type-label-outline-weight);letter-spacing:var(--type-label-outline-ls);text-transform:uppercase;color:transparent;-webkit-text-stroke:1px var(--color-accent);}
+
+  /* Spacing */
+  .space-row{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0;}
+  .space-row .bar{background:var(--color-accent);height:16px;}
+  .space-row .label{font-family:monospace;font-size:0.8rem;color:var(--color-on-surface-muted);width:140px;}
+
+  /* Radius */
+  .radius-grid{display:flex;gap:var(--space-4);flex-wrap:wrap;}
+  .radius-item{text-align:center;}
+  .radius-box{width:96px;height:96px;background:var(--color-surface-metallic);border:1px solid var(--color-border);margin-bottom:var(--space-2);}
+  .radius-item .label{font-size:0.8rem;font-family:monospace;color:var(--color-on-surface-muted);}
+
+  /* Elevation */
+  .elevation-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-4);}
+  .elev-card{padding:var(--space-4);text-align:center;font-size:0.85rem;color:var(--color-on-surface-muted);}
+  .elev-1{background:var(--color-background);border:1px solid var(--color-border-subtle);}
+  .elev-2{background:var(--color-surface);border:1px solid var(--color-border);}
+  .elev-3{background:var(--color-surface-raised);border:1px solid var(--color-border);}
+  .elev-4{background:var(--color-surface-metallic);border:1px solid var(--color-surface-metallic);}
+
+  /* Components */
+  .comp-block{margin-bottom:var(--space-6);}
+  .comp-block h3{font-family:'Archivo',sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-on-surface-muted);margin-bottom:var(--space-3);}
+  .comp-row{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;}
+
+  .btn{
+    display:inline-block;
+    font-family:'Archivo',sans-serif;
+    border:1px solid transparent;
+    cursor:pointer;
+    text-transform:uppercase;
+  }
+  .btn-primary{background:var(--color-primary);color:var(--color-on-primary);font-weight:var(--type-body-emphasis-weight);border-radius:var(--rounded-none);padding:16px 32px;}
+  .btn-primary-hover{background:#E8E8E8;color:var(--color-on-primary);font-weight:var(--type-body-emphasis-weight);border-radius:var(--rounded-none);padding:16px 32px;}
+  .btn-primary-disabled{background:var(--color-border);color:var(--color-on-surface-muted);font-weight:var(--type-body-emphasis-weight);border-radius:var(--rounded-none);padding:16px 32px;cursor:not-allowed;}
+  .btn-accent{background:transparent;color:var(--color-accent);border-color:var(--color-accent);font-weight:var(--type-label-outline-weight);letter-spacing:var(--type-label-outline-ls);border-radius:var(--rounded-none);padding:15px 31px;}
+  .btn-accent-hover{background:var(--color-accent);color:var(--color-on-accent);border-color:var(--color-accent);font-weight:var(--type-label-outline-weight);letter-spacing:var(--type-label-outline-ls);border-radius:var(--rounded-none);padding:16px 32px;}
+  .btn-ghost{background:transparent;color:var(--color-on-surface);border-color:var(--color-border);font-weight:var(--type-body-emphasis-weight);border-radius:var(--rounded-none);padding:15px 31px;}
+
+  .card-product{
+    background:var(--color-surface);
+    border:1px solid var(--color-border-subtle);
+    border-radius:var(--rounded-sm);
+    padding:var(--space-4);
+    width:220px;
+  }
+  .card-product .ph{height:140px;background:var(--color-surface-metallic);margin-bottom:var(--space-3);border-radius:var(--rounded-sm);}
+  .card-product .name{font-weight:600;margin-bottom:var(--space-1);}
+  .card-product .price{font-family:var(--type-h3-family);font-size:var(--type-h3-size);font-weight:var(--type-h3-weight);color:var(--color-primary);}
+
+  .input-field{
+    background:var(--color-surface);
+    color:var(--color-on-surface);
+    border:1px solid var(--color-border);
+    border-radius:var(--rounded-none);
+    padding:14px 16px;
+    height:48px;
+    font-family:'Archivo',sans-serif;
+    width:260px;
+  }
+  .input-field.focus{border-color:var(--color-primary);outline:none;}
+
+  .chip-tag{
+    display:inline-block;
+    background:var(--color-surface-raised);
+    color:var(--color-on-surface-muted);
+    border-radius:var(--rounded-full);
+    padding:6px 14px;
+    font-size:var(--type-caption-size);
+    letter-spacing:var(--type-caption-ls);
+    text-transform:uppercase;
+  }
+
+  .nav-bar{
+    background:var(--color-background);
+    color:var(--color-on-background);
+    padding:24px 48px;
+    border:1px solid var(--color-border-subtle);
+    display:flex;
+    justify-content:space-between;
+    font-weight:var(--type-body-emphasis-weight);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  /* Do/Dont */
+  .dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);}
+  @media (max-width:700px){.dd-grid{grid-template-columns:1fr;}}
+  .dd-col h3{text-transform:uppercase;font-size:0.9rem;letter-spacing:0.05em;margin-bottom:var(--space-3);}
+  .dd-col.do h3{color:var(--color-success);}
+  .dd-col.dont h3{color:var(--color-error);}
+  .dd-col ul{margin:0;padding-left:1.1em;color:var(--color-on-surface);}
+  .dd-col li{margin-bottom:var(--space-2);}
+
+  footer{
+    text-align:center;
+    color:var(--color-on-surface-muted);
+    font-size:0.8rem;
+    padding:var(--space-6) 0 var(--space-8);
+    border-top:1px solid var(--color-border-subtle);
+    margin-top:var(--space-8);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="word">Deluxx</p>
+  <span class="sub">Perfum</span>
+  <p class="desc">Sistema de diseño oscuro, metálico y premium para la tienda online Deluxx Perfum.</p>
+  <p class="mirror-note">Espejo legible de docs/design.md — misma fuente de verdad, dos audiencias</p>
+</header>
+
+<div class="wrap">
+
+  <section id="colors">
+    <h2 class="section-title">Colores</h2>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="block" style="background:var(--color-background);"><span style="color:var(--color-on-background)">On-background</span></div><div class="meta"><div class="name">background</div><div class="hex">#3A3A3D</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-surface);"><span style="color:var(--color-on-surface)">On-surface</span></div><div class="meta"><div class="name">surface</div><div class="hex">#2A2A2C</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-surface-raised);"><span style="color:var(--color-on-surface)">On-surface</span></div><div class="meta"><div class="name">surface-raised</div><div class="hex">#232325</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-surface-metallic);"><span style="color:var(--color-on-surface)">On-surface</span></div><div class="meta"><div class="name">surface-metallic</div><div class="hex">#55555A</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-primary);"><span style="color:var(--color-on-primary)">On-primary</span></div><div class="meta"><div class="name">primary</div><div class="hex">#FFFFFF</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-accent);"><span style="color:var(--color-on-accent)">On-accent</span></div><div class="meta"><div class="name">accent</div><div class="hex">#D42328</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-accent-hover);"><span style="color:var(--color-on-accent)">On-accent</span></div><div class="meta"><div class="name">accent-hover</div><div class="hex">#B81C21</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-border);"><span style="color:#fff">border</span></div><div class="meta"><div class="name">border</div><div class="hex">#3A3A3D</div></div></div>
+    </div>
+    <div class="swatch-grid" style="margin-top:16px;">
+      <div class="swatch"><div class="block" style="background:var(--color-success);"><span style="color:#fff">Success</span></div><div class="meta"><div class="name">success</div><div class="hex">#3EA05B</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-warning);"><span style="color:#0A0A0A">Warning</span></div><div class="meta"><div class="name">warning</div><div class="hex">#D6A527</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-error);"><span style="color:#fff">Error</span></div><div class="meta"><div class="name">error</div><div class="hex">#D42328</div></div></div>
+      <div class="swatch"><div class="block" style="background:var(--color-info);"><span style="color:#fff">Info</span></div><div class="meta"><div class="name">info</div><div class="hex">#5A8CC2</div></div></div>
+    </div>
+  </section>
+
+  <section id="typography">
+    <h2 class="section-title">Tipografía</h2>
+    <div class="type-row"><div class="t-display">Deluxx</div><div class="spec">display · Anton 700 · 4rem / 0.95</div></div>
+    <div class="type-row"><div class="t-h1">Fragancia</div><div class="spec">h1 · Anton 700 · 2.75rem</div></div>
+    <div class="type-row"><div class="t-h2">Colección</div><div class="spec">h2 · Anton 700 · 2rem</div></div>
+    <div class="type-row"><div class="t-h3">$ 45.000</div><div class="spec">h3 · Archivo 700 · 1.375rem</div></div>
+    <div class="type-row"><div class="t-body">Notas de salida: bergamota, pimienta negra y cedro ahumado.</div><div class="spec">body · Archivo 400 · 1rem</div></div>
+    <div class="type-row"><div class="t-body-em">Envío gratis en compras +$50.000</div><div class="spec">body-emphasis · Archivo 600</div></div>
+    <div class="type-row"><div class="t-caption">Edición limitada</div><div class="spec">caption · Archivo 500 · uppercase</div></div>
+    <div class="type-row"><div class="t-label-outline">Perfum</div><div class="spec">label-outline · Archivo 700 · outline accent</div></div>
+  </section>
+
+  <section id="spacing">
+    <h2 class="section-title">Espaciado</h2>
+    <div class="space-row"><div class="label">space-1 · 4px</div><div class="bar" style="width:4px;"></div></div>
+    <div class="space-row"><div class="label">space-2 · 8px</div><div class="bar" style="width:8px;"></div></div>
+    <div class="space-row"><div class="label">space-3 · 16px</div><div class="bar" style="width:16px;"></div></div>
+    <div class="space-row"><div class="label">space-4 · 24px</div><div class="bar" style="width:24px;"></div></div>
+    <div class="space-row"><div class="label">space-5 · 32px</div><div class="bar" style="width:32px;"></div></div>
+    <div class="space-row"><div class="label">space-6 · 48px</div><div class="bar" style="width:48px;"></div></div>
+    <div class="space-row"><div class="label">space-7 · 64px</div><div class="bar" style="width:64px;"></div></div>
+    <div class="space-row"><div class="label">space-8 · 96px</div><div class="bar" style="width:96px;"></div></div>
+    <div class="space-row"><div class="label">space-9 · 128px</div><div class="bar" style="width:128px;"></div></div>
+  </section>
+
+  <section id="radius">
+    <h2 class="section-title">Radios</h2>
+    <div class="radius-grid">
+      <div class="radius-item"><div class="radius-box" style="border-radius:var(--rounded-none);"></div><div class="label">none · 0px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius:var(--rounded-sm);"></div><div class="label">sm · 2px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius:var(--rounded-md);"></div><div class="label">md · 4px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius:var(--rounded-full);"></div><div class="label">full · 999px</div></div>
+    </div>
+  </section>
+
+  <section id="elevation">
+    <h2 class="section-title">Elevación y profundidad</h2>
+    <div class="elevation-grid">
+      <div class="elev-card elev-3">surface-raised<br>modales / popovers (más oscuro)</div>
+      <div class="elev-card elev-2">surface<br>cards, hairline border</div>
+      <div class="elev-card elev-1">background<br>plano base — gris del logo</div>
+      <div class="elev-card elev-4">surface-metallic<br>highlight / hover (más claro)</div>
+    </div>
+  </section>
+
+  <section id="components">
+    <h2 class="section-title">Componentes</h2>
+
+    <div class="comp-block">
+      <h3>Buttons — primary</h3>
+      <div class="comp-row">
+        <button class="btn btn-primary">Add to Cart</button>
+        <button class="btn btn-primary-hover">Hover</button>
+        <button class="btn btn-primary-disabled" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Buttons — accent (outline, estilo "Perfum")</h3>
+      <div class="comp-row">
+        <button class="btn btn-accent">View Collection</button>
+        <button class="btn btn-accent-hover">Hover</button>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Buttons — ghost</h3>
+      <div class="comp-row">
+        <button class="btn btn-ghost">Filtrar</button>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Card product</h3>
+      <div class="comp-row">
+        <div class="card-product">
+          <div class="ph"></div>
+          <div class="name">Noir Absolu EDP</div>
+          <div class="price">$ 45.000</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Input field</h3>
+      <div class="comp-row">
+        <input class="input-field" placeholder="tu@email.com">
+        <input class="input-field focus" placeholder="Focused state">
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Badge price + chip tag</h3>
+      <div class="comp-row">
+        <span class="card-product" style="width:auto;padding:8px 16px;background:transparent;border:none;"><span class="price" style="font-size:1.5rem;">$ 45.000</span></span>
+        <span class="chip-tag">Amaderado</span>
+        <span class="chip-tag">100ml</span>
+      </div>
+    </div>
+
+    <div class="comp-block">
+      <h3>Nav bar</h3>
+      <div class="nav-bar">
+        <span>Deluxx Perfum</span>
+        <span>Colección · Sobre nosotros · Carrito</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="dos-donts">
+    <h2 class="section-title">Do's and Don'ts</h2>
+    <div class="dd-grid">
+      <div class="dd-col do">
+        <h3>✓ Hacer</h3>
+        <ul>
+          <li>Mantener el rojo como acento raro — un CTA o precio por vista.</li>
+          <li>Usar la tipografía condensada solo en strings cortos de alto impacto.</li>
+          <li>Dejar que la fotografía de producto y el espacio negativo dominen.</li>
+          <li>Mantener esquinas afiladas salvo en chips/tags.</li>
+          <li>Construir profundidad con capas tonales y bordes finos, no sombras.</li>
+        </ul>
+      </div>
+      <div class="dd-col dont">
+        <h3>✗ Evitar</h3>
+        <ul>
+          <li>No introducir un segundo color de acento (azules, dorados, pasteles).</li>
+          <li>No redondear botones, cards, inputs o nav — pierde identidad de marca.</li>
+          <li>No usar sombras suaves ni glows — contradicen el lenguaje metálico plano.</li>
+          <li>No apretar grillas de producto para caber más ítems.</li>
+          <li>No usar la tipografía display en párrafos largos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Deluxx Perfum — Design System v.alpha · Mirror de docs/design.md</footer>
+
+</body>
+</html>
