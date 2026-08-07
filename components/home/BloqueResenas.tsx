@@ -51,6 +51,18 @@ export default function BloqueResenas() {
           Lo que dicen nuestros clientes
         </h2>
       </div>
+
+      {/* El carrusel duplica cada reseña para el loop visual y se marca
+          aria-hidden — esta lista, oculta visualmente, es la que
+          escuchan los lectores de pantalla (mismo patrón que CintaBeneficios). */}
+      <ul className="sr-only">
+        {RESENAS.map((r) => (
+          <li key={r.id}>
+            {r.name}, {r.role}: {r.description} ({r.rating} de 5 estrellas)
+          </li>
+        ))}
+      </ul>
+
       <InfiniteMovingCards items={RESENAS} speed="slow" maskColor="surface" />
     </section>
   );

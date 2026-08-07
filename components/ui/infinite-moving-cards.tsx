@@ -136,6 +136,10 @@ export function InfiniteMovingCards<
   return (
     <div
       className={cn("relative w-full", className)}
+      // El track duplica cada item para el loop visual — sin esto, un
+      // lector de pantalla anuncia cada reseña dos veces. El contenido
+      // real debe exponerse aparte (ver BloqueResenas: lista sr-only).
+      aria-hidden="true"
       onMouseEnter={pauseOnHover ? () => setHovered(true) : undefined}
       onMouseLeave={pauseOnHover ? () => setHovered(false) : undefined}
     >
