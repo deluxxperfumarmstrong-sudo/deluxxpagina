@@ -14,7 +14,7 @@ export default function CarritoPage() {
   useEffect(() => setMontado(true), []);
 
   return (
-    <div className="mx-auto max-w-5xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-5xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-3xl md:text-4xl text-on-background mb-8">Carrito</h1>
 
       {!montado ? null : items.length === 0 ? (
@@ -22,7 +22,7 @@ export default function CarritoPage() {
           <p className="text-on-surface-muted mb-4">Tu carrito está vacío.</p>
           <Link
             href="/catalogo"
-            className="inline-block border border-accent text-accent font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent transition-colors"
+            className="inline-block border border-accent text-accent font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-[32px] py-[16px] hover:bg-accent hover:text-on-accent transition-colors"
           >
             Ver catálogo
           </Link>

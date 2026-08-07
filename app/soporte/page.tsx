@@ -43,7 +43,7 @@ const PREGUNTAS: PreguntaFrecuente[] = [
 
 export default function SoportePage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-3xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-4xl md:text-5xl text-on-background mb-4">Soporte</h1>
       <p className="text-on-surface-muted mb-10 max-w-lg">
         Las dudas más comunes antes de pedir. Si no encontrás lo que buscás, escribinos
@@ -52,7 +52,7 @@ export default function SoportePage() {
 
       <Acordeon items={PREGUNTAS} />
 
-      <div className="mt-12 bg-surface rounded-sm p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="mt-12 bg-surface rounded-sm p-4 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-xl text-on-background mb-1">
             ¿No encontraste tu respuesta?
@@ -65,7 +65,7 @@ export default function SoportePage() {
           href={`https://wa.me/${WHATSAPP.numero}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 hover:bg-[#E8E8E8] transition-colors"
+          className="w-full text-center md:w-auto md:shrink-0 bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
         >
           Escribir por WhatsApp
         </a>

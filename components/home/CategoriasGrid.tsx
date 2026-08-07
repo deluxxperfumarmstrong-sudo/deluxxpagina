@@ -7,7 +7,7 @@ export default function CategoriasGrid({ categorias }: { categorias: Categoria[]
   if (categorias.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-6 md:px-12 py-10 md:py-14">
+    <section className="mx-auto max-w-7xl px-4 md:px-12 py-10 md:py-14">
       <h2 className="font-display text-3xl md:text-4xl text-on-background mb-6">Categorías</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {categorias.map((cat, i) => (

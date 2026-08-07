@@ -33,7 +33,7 @@ export default async function CatalogoPage({
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-7xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-3xl md:text-4xl text-on-background mb-2">Catálogo</h1>
       <p className="text-on-surface-muted mb-6">{total} productos</p>
 

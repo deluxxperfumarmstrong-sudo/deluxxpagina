@@ -49,7 +49,7 @@ export default function Header() {
         scrolleado ? "bg-background border-b border-border-subtle" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto max-w-7xl px-6 md:px-12 py-3 md:py-4 flex items-center justify-between gap-6">
+      <div className="mx-auto max-w-7xl px-4 md:px-12 py-3 md:py-4 flex items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <MenuMovil />
           <Wordmark size="sm" />

@@ -8,7 +8,7 @@ export default function Hero() {
       <HeroShader>
         <Frasco3DOverlay />
         <div
-          className="relative h-full flex flex-col items-start justify-end md:justify-center px-6 md:px-12 pb-12 md:pb-0 max-w-3xl"
+          className="relative h-full flex flex-col items-start justify-end md:justify-center px-4 md:px-12 pb-12 md:pb-0 max-w-3xl"
           style={{ paddingTop: "var(--header-height, 88px)" }}
         >
           <h1 className="font-display italic leading-none flex flex-nowrap items-baseline gap-x-1.5 sm:gap-x-3 drop-shadow-[0_4px_28px_rgba(0,0,0,0.75)]">
@@ -26,13 +26,13 @@ export default function Hero() {
           <div className="mt-6 md:mt-8 flex flex-wrap gap-3 md:gap-4">
             <Link
               href="/catalogo"
-              className="whitespace-nowrap bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 hover:bg-[#E8E8E8] transition-colors"
+              className="whitespace-nowrap bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
             >
               Ver catálogo
             </Link>
             <Link
               href="/muestras"
-              className="whitespace-nowrap border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
+              className="whitespace-nowrap border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-[32px] py-[16px] hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
             >
               Pedir muestra
             </Link>

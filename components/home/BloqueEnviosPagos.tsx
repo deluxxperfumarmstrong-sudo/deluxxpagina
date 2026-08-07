@@ -6,7 +6,7 @@ import Reveal from "@/components/ui/Reveal";
 
 export default function BloqueEnviosPagos() {
   return (
-    <section className="mx-auto max-w-7xl px-6 md:px-12 py-10 md:py-14">
+    <section className="mx-auto max-w-7xl px-4 md:px-12 py-10 md:py-14">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <Reveal className="border border-border-subtle p-6 md:p-8 flex gap-4">
           <div className="shrink-0 w-12 h-12 rounded-sm bg-surface-raised flex items-center justify-center text-accent">

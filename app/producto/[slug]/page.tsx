@@ -32,7 +32,7 @@ export default async function ProductoPage({
   if (!producto) notFound();
 
   return (
-    <div className="mx-auto max-w-6xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-6xl px-4 md:px-12 py-12 md:py-16">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
         <GaleriaProducto imagenes={producto.imagenes} nombre={producto.nombre} />
         <FichaProducto producto={producto} />

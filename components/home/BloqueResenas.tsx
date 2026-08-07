@@ -46,7 +46,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
 export default function BloqueResenas() {
   return (
     <section className="bg-surface py-10 md:py-14 overflow-hidden">
-      <div className="mx-auto max-w-7xl px-6 md:px-12 mb-8">
+      <div className="mx-auto max-w-7xl px-4 md:px-12 mb-8">
         <h2 className="font-display text-3xl md:text-4xl text-on-background">
           Lo que dicen nuestros clientes
         </h2>

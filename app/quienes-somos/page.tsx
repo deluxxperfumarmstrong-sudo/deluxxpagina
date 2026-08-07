@@ -33,7 +33,7 @@ const VALORES = [
 
 export default function QuienesSomosPage() {
   return (
-    <div className="mx-auto max-w-5xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-5xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-4xl md:text-5xl text-on-background mb-8 max-w-2xl">
         Perfumería para quien no se conforma con lo genérico
       </h1>
@@ -63,11 +63,11 @@ export default function QuienesSomosPage() {
         ))}
       </div>
 
-      <div className="border border-border-subtle p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="border border-border-subtle p-4 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <p className="text-on-surface">¿Tenés dudas antes de pedir? Estamos para ayudarte.</p>
         <Link
           href="/soporte"
-          className="shrink-0 border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-8 py-4 hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
+          className="w-full text-center md:w-auto md:shrink-0 border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-[32px] py-[16px] hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
         >
           Ir a soporte
         </Link>

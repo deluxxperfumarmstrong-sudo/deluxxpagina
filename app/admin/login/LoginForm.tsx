@@ -28,7 +28,7 @@ export default function LoginForm({ next }: { next: string }) {
       <button
         type="submit"
         disabled={pendiente}
-        className="bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 hover:bg-[#E8E8E8] transition-colors disabled:opacity-50"
+        className="bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors disabled:opacity-50"
       >
         {pendiente ? "Entrando..." : "Entrar"}
       </button>

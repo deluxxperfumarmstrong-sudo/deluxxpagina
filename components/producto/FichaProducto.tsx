@@ -68,13 +68,13 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
 
       <PrecioBloque precio={precio} sena={sena} />
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center border border-border">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <div className="flex items-center justify-between sm:justify-start border border-border">
           <button
             type="button"
             aria-label="Restar cantidad"
             onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-            className="w-11 h-12 text-on-surface hover:text-accent"
+            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent"
           >
             −
           </button>
@@ -85,7 +85,7 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
             type="button"
             aria-label="Sumar cantidad"
             onClick={() => setCantidad((c) => c + 1)}
-            className="w-11 h-12 text-on-surface hover:text-accent"
+            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent"
           >
             +
           </button>
@@ -94,7 +94,7 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
         <button
           type="button"
           onClick={handleAgregar}
-          className={`flex-1 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 transition-colors ${
+          className={`sm:flex-1 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] transition-colors ${
             agregado
               ? "bg-success text-on-primary"
               : "bg-primary text-on-primary hover:bg-[#E8E8E8]"

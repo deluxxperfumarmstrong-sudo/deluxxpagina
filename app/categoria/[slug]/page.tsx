@@ -52,7 +52,7 @@ export default async function CategoriaPage({
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
 
   return (
-    <div className="mx-auto max-w-7xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-7xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-3xl md:text-4xl text-on-background mb-2">
         {categoria.nombre}
       </h1>

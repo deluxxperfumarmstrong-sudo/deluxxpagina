@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function MuestrasPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 md:px-12 py-12 md:py-16">
+    <div className="mx-auto max-w-3xl px-4 md:px-12 py-12 md:py-16">
       <h1 className="font-display text-3xl md:text-4xl text-on-background mb-6">Muestras</h1>
       <p className="text-on-surface leading-relaxed mb-4">
         Muchos de nuestros perfumes tienen muestra disponible para que puedas probarlos antes de
@@ -27,7 +27,7 @@ export default function MuestrasPage() {
       </p>
       <Link
         href="/catalogo"
-        className="inline-block bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 hover:bg-[#E8E8E8] transition-colors"
+        className="inline-block bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
       >
         Ver catálogo
       </Link>
