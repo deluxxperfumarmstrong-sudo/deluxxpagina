@@ -7,6 +7,11 @@ en `docs/design.md` — ese documento es la autoridad de estilo; estas mejoras
 lo respetan y, donde algo lo viola, corrigen la implementación para que
 vuelva a cumplirlo.
 
+**Pase 2 (adapt.md, mobile-first):** revisión dedicada del sitio en
+375px, el viewport que más tráfico recibe. Ver [SUMMARY.md](SUMMARY.md#pase-2--auditoría-específica-mobile-localhost53872-viewport-375×812)
+para el hallazgo raíz (colisión entre la escala de spacing editorial y
+las utilidades numéricas de Tailwind) y todos los fixes derivados.
+
 ## Método
 
 1. `node .claude/skills/impeccable/scripts/context.mjs` para cargar
