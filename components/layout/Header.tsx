@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Wordmark from "./Wordmark";
 import CarritoBadge from "./CarritoBadge";
 import MenuMovil from "./MenuMovil";
 import { NAV_LINKS } from "@/lib/config";
 
 export default function Header() {
+  const pathname = usePathname();
   // Transparente en el tope de la página (para no tapar la animación del
   // hero) y con fondo sólido apenas se scrollea. `fixed` en vez de `sticky`
   // porque necesita superponerse al hero, no empujarlo — ver HeaderSpacer.
@@ -53,15 +55,21 @@ export default function Header() {
           <Wordmark size="sm" />
         </div>
         <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide text-on-background hover:text-accent transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const activo = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={activo ? "page" : undefined}
+                className={`font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide border-b transition-colors hover:text-accent ${
+                  activo ? "text-on-background border-on-background" : "text-on-background border-transparent"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
         <CarritoBadge />
       </div>

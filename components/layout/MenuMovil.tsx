@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NAV_LINKS } from "@/lib/config";
 
 export default function MenuMovil() {
   const [abierto, setAbierto] = useState(false);
   const contenedorRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Cierra con click afuera o Escape — el resto del sitio (selects,
   // acordeón) ya respeta estas convenciones de teclado, el menú móvil
@@ -70,16 +72,22 @@ export default function MenuMovil() {
             : "opacity-0 scale-y-95 pointer-events-none"
         }`}
       >
-        {NAV_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            onClick={() => setAbierto(false)}
-            className="font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide text-on-background hover:text-accent transition-colors"
-          >
-            {link.label}
-          </Link>
-        ))}
+        {NAV_LINKS.map((link) => {
+          const activo = pathname === link.href || pathname.startsWith(`${link.href}/`);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setAbierto(false)}
+              aria-current={activo ? "page" : undefined}
+              className={`font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide transition-colors hover:text-accent ${
+                activo ? "text-accent-text" : "text-on-background"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
