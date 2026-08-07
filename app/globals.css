@@ -140,6 +140,34 @@ h1, h2, h3, .font-display {
   outline-offset: 1px;
 }
 
+/* typography.caption y components.chip-tag de design.md — se usaban como
+   className en varios componentes pero nunca existieron como utilidad de
+   Tailwind, así que no aplicaban ningún estilo. Definidas acá como fuente
+   única de verdad, en @layer components para que las utilidades de
+   Tailwind puestas en el mismo elemento (ej. un tamaño de texto puntual)
+   sigan pudiendo pisarlas, como es habitual con clases base. */
+@layer components {
+  .text-caption {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+  }
+
+  .chip-tag {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-surface-raised);
+    color: var(--color-on-surface-muted);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    border-radius: var(--radius-full);
+    padding: 6px 14px;
+  }
+}
+
 /* Cinta de beneficios (home) — dos tandas idénticas, se traslada la mitad
    del ancho total para que el loop no se note. */
 @keyframes marquee {
