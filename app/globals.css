@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 :root {
+  /* El sitio es siempre oscuro (no hay modo claro) pero nunca se lo decía
+     al navegador — los selects, checkboxes y la scrollbar nativa se
+     pintaban con el chrome claro del SO, un salto visual feo contra el
+     resto de la UI. */
+  color-scheme: dark;
+
   /* Colores — docs/design.md */
   --color-background: #3a3a3d;
   --color-surface: #2a2a2c;
