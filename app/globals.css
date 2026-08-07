@@ -16,6 +16,12 @@
   --color-accent: #d42328;
   --color-accent-hover: #b81c21;
   --color-on-accent: #ffffff;
+  /* Rojo aclarado para texto/bordes en reposo sobre background o surface —
+     el accent original (#d42328) da 2.2:1 / 2.6:1 de contraste ahí, por
+     debajo de WCAG AA. Este tono (misma hue, +L) llega a ≥4.5:1 en ambos
+     fondos. El accent original se mantiene para fills (botón sólido,
+     hover, precio) donde ya cumple contraste con texto blanco. */
+  --color-accent-text: #f0898e;
   --color-success: #3ea05b;
   --color-warning: #d6a527;
   --color-error: #d42328;
@@ -57,6 +63,7 @@
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
   --color-on-accent: var(--color-on-accent);
+  --color-accent-text: var(--color-accent-text);
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);
   --color-error: var(--color-error);

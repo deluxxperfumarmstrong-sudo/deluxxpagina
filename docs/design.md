@@ -17,6 +17,7 @@ colors:
   accent: "#D42328"
   accent-hover: "#B81C21"
   on-accent: "#FFFFFF"
+  accent-text: "#F0898E"
   success: "#3EA05B"
   warning: "#D6A527"
   error: "#D42328"
@@ -112,7 +113,7 @@ components:
     padding: "16px 32px"
   button-accent:
     backgroundColor: "transparent"
-    textColor: "{colors.accent}"
+    textColor: "{colors.accent-text}"
     typography: "{typography.label-outline}"
     rounded: "{rounded.none}"
     padding: "15px 31px"
@@ -176,7 +177,7 @@ Deluxx Perfum is a dark, masculine, premium online fragrance store. The logo set
 
 ## Colors
 
-The palette is almost monochrome by design, mirroring the logo's black-to-metallic-gray gradient. `background` (#3A3A3D) is that same brushed metallic gray, not black — the app's base plane reads like the right side of the logo's gradient. `surface` and `surface-raised` sit darker than background (#2A2A2C → #232325) so cards and panels recede into shadow against the gray field, while `surface-metallic` (#55555A) sits lighter, reserved for highlight/hover states — think brushed metal catching light. `primary` is pure white (#FFFFFF), used for the wordmark-style headlines and primary actions, echoing the logo's bold white "DELUXX." `accent` (#D42328) is the exact temperature of the logo's red outline — reserved for price emphasis, primary CTAs on hover, sale badges, and the occasional outlined label treatment that mirrors the "PERFUM" wordmark. Semantic colors (`success`, `warning`, `info`) are desaturated enough not to compete with the red accent; `error` intentionally reuses the accent red since this brand only needs one "urgent" color. All body text pairs (`on-background`, `on-surface`) are verified at WCAG AA against their respective backgrounds.
+The palette is almost monochrome by design, mirroring the logo's black-to-metallic-gray gradient. `background` (#3A3A3D) is that same brushed metallic gray, not black — the app's base plane reads like the right side of the logo's gradient. `surface` and `surface-raised` sit darker than background (#2A2A2C → #232325) so cards and panels recede into shadow against the gray field, while `surface-metallic` (#55555A) sits lighter, reserved for highlight/hover states — think brushed metal catching light. `primary` is pure white (#FFFFFF), used for the wordmark-style headlines and primary actions, echoing the logo's bold white "DELUXX." `accent` (#D42328) is the exact temperature of the logo's red outline — reserved for price emphasis, primary CTAs on hover, sale badges, and the occasional outlined label treatment that mirrors the "PERFUM" wordmark. `accent` is a *fill* color: it only meets WCAG AA when it sits behind white text (`on-accent`), so it belongs on solid backgrounds and hover states, not as standalone text or a border on top of `background`/`surface`. `accent-text` (#F0898E) is the same red hue lightened until it clears 4.5:1 on both `background` and `surface` — use it whenever accent-colored text or a border needs to sit directly on the page at rest (outline-button copy and border, badges, inline links, price/seña callouts). Semantic colors (`success`, `warning`, `info`) are desaturated enough not to compete with the red accent; `error` intentionally reuses the accent red since this brand only needs one "urgent" color. All body text pairs (`on-background`, `on-surface`) are verified at WCAG AA against their respective backgrounds.
 
 ## Typography
 
