@@ -96,7 +96,7 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
           onClick={handleAgregar}
           className={`flex-1 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-8 py-4 transition-colors ${
             agregado
-              ? "bg-success text-on-accent"
+              ? "bg-success text-on-primary"
               : "bg-primary text-on-primary hover:bg-[#E8E8E8]"
           }`}
         >
