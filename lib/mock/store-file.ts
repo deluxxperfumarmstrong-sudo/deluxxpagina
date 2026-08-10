@@ -54,6 +54,10 @@ export function leerCatalogo(): { categorias: Categoria[]; productos: Producto[]
     const data = JSON.parse(raw) as CatalogoSerializado;
     const categorias: Categoria[] = data.categorias.map((c) => ({
       ...c,
+      // Compat con .mock-data/catalogo.json escrito antes de que este campo
+      // existiera — sin esto, categorías viejas quedan con `undefined` en
+      // vez de un array vacío.
+      mililitrosDisponibles: c.mililitrosDisponibles ?? [],
       createdAt: new Date(c.createdAt),
     }));
     const categoriaPorId = new Map(categorias.map((c) => [c.id, c]));

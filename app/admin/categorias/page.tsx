@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCategoriasAdmin, getProductosAdmin } from "@/lib/data";
 import CategoriasOrdenables from "@/components/admin/CategoriasOrdenables";
 
@@ -12,7 +13,15 @@ export default async function AdminCategoriasPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-on-background mb-2">Categorías</h1>
+      <div className="flex items-center justify-between gap-4 mb-2">
+        <h1 className="font-display text-3xl text-on-background">Categorías</h1>
+        <Link
+          href="/admin/categorias/nueva"
+          className="bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-6 py-3 hover:bg-[#E8E8E8] transition-colors"
+        >
+          Nueva categoría
+        </Link>
+      </div>
       <p className="text-sm text-on-surface-muted mb-8">
         Solo se listan en el sitio las categorías activas que tengan al menos un producto
         activo (regla 6). Arrastrá para cambiar el orden en el catálogo.

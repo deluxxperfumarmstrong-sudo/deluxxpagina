@@ -163,6 +163,7 @@ export function generarCatalogoMock(): { categorias: Categoria[]; productos: Pro
     slug: c.slug,
     descripcion: null,
     imagenUrl: null,
+    mililitrosDisponibles: [...MILILITROS_VALIDOS],
     orden: idx,
     activa: true,
     createdAt: new Date(2026, 0, 1),

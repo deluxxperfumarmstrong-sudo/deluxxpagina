@@ -27,14 +27,38 @@ export default function ProductoForm({
   const [mlSeleccionados, setMlSeleccionados] = useState<number[]>(
     producto?.mililitros ?? []
   );
+  const [categoriaId, setCategoriaId] = useState(producto?.categoriaId ?? "");
   const [destacado, setDestacado] = useState(producto?.destacado ?? false);
   const yaEraDestacado = producto?.destacado ?? false;
   const limiteDestacadosAlcanzado = !yaEraDestacado && destacadosActuales >= MAX_DESTACADOS;
+
+  // Cada categoría define qué tamaños puede tener un producto suyo (ver
+  // CategoriaForm.tsx). Sin categoría elegida, o si es una categoría vieja
+  // sembrada antes de que este campo existiera (queda con []), se cae a la
+  // lista completa en vez de no mostrar ningún tamaño para elegir.
+  const categoriaElegida = categorias.find((c) => c.id === categoriaId);
+  const mlDisponibles: number[] =
+    categoriaElegida && categoriaElegida.mililitrosDisponibles.length > 0
+      ? categoriaElegida.mililitrosDisponibles
+      : [...MILILITROS_VALIDOS];
 
   function toggleMl(ml: number) {
     setMlSeleccionados((prev) =>
       prev.includes(ml) ? prev.filter((x) => x !== ml) : [...prev, ml].sort((a, b) => a - b)
     );
+  }
+
+  function handleCategoriaChange(nuevaCategoriaId: string) {
+    setCategoriaId(nuevaCategoriaId);
+    const categoria = categorias.find((c) => c.id === nuevaCategoriaId);
+    const permitidos: number[] =
+      categoria && categoria.mililitrosDisponibles.length > 0
+        ? categoria.mililitrosDisponibles
+        : [...MILILITROS_VALIDOS];
+    // Si el tamaño ya no está permitido en la categoría nueva, se
+    // deselecciona — de lo contrario quedaría un checkbox tildado pero
+    // oculto (la fila ni se muestra), enviando un ml inválido al guardar.
+    setMlSeleccionados((prev) => prev.filter((ml) => permitidos.includes(ml)));
   }
 
   return (
@@ -48,12 +72,13 @@ export default function ProductoForm({
             className="campo-admin"
           />
         </Campo>
-        <Campo label="Slug">
-          <input name="slug" required defaultValue={producto?.slug} className="campo-admin" />
+        <Campo label="Slug (opcional)">
+          <input name="slug" defaultValue={producto?.slug} className="campo-admin" />
           <p className="text-xs text-on-surface-muted mt-1">
             Es la dirección web del producto (ej: deluxxperfum.com/producto/
             <span className="text-on-surface">este-texto</span>). Solo minúsculas, números y guiones,
-            sin espacios ni tildes — tiene que ser único.
+            sin espacios ni tildes — tiene que ser único. Si lo dejás vacío, se genera solo a partir
+            del nombre.
           </p>
         </Campo>
       </div>
@@ -63,7 +88,8 @@ export default function ProductoForm({
           <select
             name="categoriaId"
             required
-            defaultValue={producto?.categoriaId}
+            value={categoriaId}
+            onChange={(e) => handleCategoriaChange(e.target.value)}
             className="campo-admin"
           >
             <option value="">Elegir...</option>
@@ -99,6 +125,11 @@ export default function ProductoForm({
         <p className="text-xs uppercase tracking-widest text-on-surface-muted mb-2">
           Tamaños, precio y stock (regla 8 — cada ml elegido necesita un precio)
         </p>
+        {!categoriaElegida && (
+          <p className="text-xs text-on-surface-muted mb-2">
+            Elegí una categoría arriba para ver sus tamaños disponibles.
+          </p>
+        )}
         {/* Encabezado de columnas — el checkbox de tamaño no lleva rótulo
             (ya se lee en la fila: "50 ml"), pero el resto sí, porque son
             varios inputs numéricos vacíos uno al lado del otro y sin esto no
@@ -116,7 +147,7 @@ export default function ProductoForm({
           </span>
         </div>
         <div className="flex flex-col gap-2">
-          {MILILITROS_VALIDOS.map((ml) => {
+          {mlDisponibles.map((ml) => {
             const activo = mlSeleccionados.includes(ml);
             return (
               <div key={ml} className="flex flex-wrap items-center gap-2 sm:gap-3">

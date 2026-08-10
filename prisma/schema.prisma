@@ -18,7 +18,14 @@ model Categoria {
   nombre      String     @unique
   slug        String     @unique
   descripcion String?
+  // Guarda un public_id de Cloudinary (mismo criterio que Producto.imagenes),
+  // no una URL completa pese al nombre del campo — se usa como imagen de la
+  // tarjeta de acceso directo en la home (ver ImagenCategoria.tsx).
   imagenUrl   String?
+  // Subconjunto de MILILITROS_VALIDOS (lib/config.ts) que se puede elegir al
+  // cargar un producto de esta categoría — cada categoría nueva lo pide sí o
+  // sí (ver CategoriaForm.tsx).
+  mililitrosDisponibles Int[] @default([])
   orden       Int        @default(0)
   activa      Boolean    @default(true)
   createdAt   DateTime   @default(now())

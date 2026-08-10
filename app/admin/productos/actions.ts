@@ -15,6 +15,7 @@ import {
 } from "@/lib/data";
 import { validarCoherenciaPreciosMl, validarCoherenciaStockMl } from "@/lib/validacion";
 import { MAX_DESTACADOS } from "@/lib/config";
+import { slugify } from "@/lib/slug";
 import type { TipoProducto } from "@/lib/types";
 
 export type EstadoProducto = { error: string | null };
@@ -46,11 +47,11 @@ function leerFormulario(formData: FormData): ProductoInput {
   }
 
   const nombre = String(formData.get("nombre") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+  // Si el campo slug queda vacío, se autogenera a partir del nombre en vez
+  // de exigirlo — sigue pudiéndose editar a mano para casos donde el nombre
+  // no da un slug lindo (ej. nombres muy largos o con caracteres raros).
+  const slugTipeado = slugify(String(formData.get("slug") ?? ""));
+  const slug = slugTipeado || slugify(nombre);
   const descripcion = String(formData.get("descripcion") ?? "").trim();
   const notas = String(formData.get("notas") ?? "").trim();
   // Los public_id de Cloudinary llegan como inputs ocultos repetidos

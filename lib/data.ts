@@ -285,6 +285,38 @@ export async function eliminarProducto(id: string): Promise<void> {
   await prisma.producto.delete({ where: { id } });
 }
 
+export type CategoriaInput = {
+  nombre: string;
+  slug: string;
+  imagenUrl: string;
+  mililitrosDisponibles: number[];
+};
+
+export async function crearCategoria(input: CategoriaInput): Promise<Categoria> {
+  if (USE_MOCK) {
+    const { categorias, productos } = leerCatalogo();
+    const ordenMax = categorias.reduce((max, c) => Math.max(max, c.orden), -1);
+    const nueva: Categoria = {
+      id: `mock-cat-${input.slug}-${Date.now()}`,
+      nombre: input.nombre,
+      slug: input.slug,
+      descripcion: null,
+      imagenUrl: input.imagenUrl,
+      mililitrosDisponibles: input.mililitrosDisponibles,
+      orden: ordenMax + 1,
+      activa: true,
+      createdAt: new Date(),
+    };
+    categorias.push(nueva);
+    guardarCatalogo(categorias, productos);
+    return nueva;
+  }
+  const agregado = await prisma.categoria.aggregate({ _max: { orden: true } });
+  return prisma.categoria.create({
+    data: { ...input, orden: (agregado._max.orden ?? -1) + 1 },
+  });
+}
+
 export async function toggleCategoriaActiva(id: string): Promise<void> {
   if (USE_MOCK) {
     const { categorias, productos } = leerCatalogo();

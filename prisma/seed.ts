@@ -26,12 +26,16 @@ async function main() {
       update: {
         nombre: cat.nombre,
         activa: cat.activa,
+        // Sí se pisa en `update`, a diferencia de `orden`: no es curación
+        // manual, es completar un campo nuevo en categorías ya sembradas.
+        mililitrosDisponibles: cat.mililitrosDisponibles,
       },
       create: {
         nombre: cat.nombre,
         slug: cat.slug,
         orden: cat.orden,
         activa: cat.activa,
+        mililitrosDisponibles: cat.mililitrosDisponibles,
       },
     });
     idPorSlug.set(cat.slug, creada.id);

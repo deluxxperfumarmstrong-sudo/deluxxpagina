@@ -5,7 +5,10 @@ export type Categoria = {
   nombre: string;
   slug: string;
   descripcion: string | null;
+  // public_id de Cloudinary (no una URL completa) — ver comentario en schema.prisma.
   imagenUrl: string | null;
+  // Subconjunto de MILILITROS_VALIDOS elegible al cargar un producto de esta categoría.
+  mililitrosDisponibles: number[];
   orden: number;
   activa: boolean;
   createdAt: Date;

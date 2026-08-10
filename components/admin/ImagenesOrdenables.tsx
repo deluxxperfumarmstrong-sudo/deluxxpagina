@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { CldImage, CldUploadWidget } from "next-cloudinary";
+import { useRef, useState } from "react";
+import { CldImage } from "next-cloudinary";
 import {
   DndContext,
   PointerSensor,
@@ -30,10 +30,6 @@ const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 const CLOUD_NAME_LISTO = !!CLOUD_NAME && CLOUD_NAME !== "dxxxxxx";
 const CLOUDINARY_LISTO =
   CLOUD_NAME_LISTO && !!UPLOAD_PRESET && UPLOAD_PRESET !== "xxxxxxxx";
-
-type ResultadoSubida = {
-  info?: { public_id?: string } | string;
-};
 
 function Miniatura({
   id,
@@ -99,6 +95,9 @@ export default function ImagenesOrdenables({
 }) {
   const [imagenes, setImagenes] = useState<string[]>(valorInicial);
   const [publicIdManual, setPublicIdManual] = useState("");
+  const [subiendo, setSubiendo] = useState(false);
+  const [errorSubida, setErrorSubida] = useState<string | null>(null);
+  const inputArchivoRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -108,6 +107,35 @@ export default function ImagenesOrdenables({
   function agregar(publicId: string) {
     if (!publicId || imagenes.includes(publicId)) return;
     setImagenes((prev) => [...prev, publicId]);
+  }
+
+  // Sube directo a la API de Cloudinary vía fetch en vez de CldUploadWidget
+  // — el widget abre su propio diálogo con pestañas para elegir la fuente
+  // (Mis archivos, Cámara, Google Drive, etc.), y lo que se quiere acá es
+  // que el botón abra derecho el explorador de archivos del sistema, sin
+  // ese paso intermedio. Mismo upload preset "unsigned", misma carpeta.
+  async function subirArchivos(files: FileList) {
+    setSubiendo(true);
+    setErrorSubida(null);
+    try {
+      for (const archivo of Array.from(files)) {
+        const form = new FormData();
+        form.append("file", archivo);
+        form.append("upload_preset", UPLOAD_PRESET!);
+        form.append("folder", "deluxx/productos");
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+          method: "POST",
+          body: form,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error?.message || "Error al subir la imagen.");
+        if (data.public_id) agregar(data.public_id);
+      }
+    } catch (e) {
+      setErrorSubida(e instanceof Error ? e.message : "No se pudo subir una de las imágenes.");
+    } finally {
+      setSubiendo(false);
+    }
   }
 
   function quitar(publicId: string) {
@@ -159,25 +187,32 @@ export default function ImagenesOrdenables({
       )}
 
       {CLOUDINARY_LISTO ? (
-        <CldUploadWidget
-          uploadPreset={UPLOAD_PRESET}
-          options={{ multiple: true, folder: "deluxx/productos" }}
-          onSuccess={(result) => {
-            const info = (result as ResultadoSubida)?.info;
-            const publicId = typeof info === "object" ? info?.public_id : undefined;
-            if (publicId) agregar(publicId);
-          }}
-        >
-          {({ open }) => (
-            <button
-              type="button"
-              onClick={() => open()}
-              className="border border-border text-on-surface text-sm font-semibold px-4 py-2 hover:border-accent hover:text-accent transition-colors"
-            >
-              + Subir imágenes
-            </button>
-          )}
-        </CldUploadWidget>
+        <div>
+          <input
+            ref={inputArchivoRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                subirArchivos(e.target.files);
+              }
+              // Sin esto, elegir el mismo archivo dos veces seguidas no
+              // dispara onChange la segunda vez (el input no detecta cambio).
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => inputArchivoRef.current?.click()}
+            disabled={subiendo}
+            className="border border-border text-on-surface text-sm font-semibold px-4 py-2 hover:border-accent hover:text-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {subiendo ? "Subiendo…" : "+ Subir imágenes"}
+          </button>
+          {errorSubida && <p className="text-xs text-error mt-2">{errorSubida}</p>}
+        </div>
       ) : (
         <div className="border border-dashed border-border-subtle p-4 flex flex-col gap-3">
           <p className="text-xs text-on-surface-muted leading-relaxed">
