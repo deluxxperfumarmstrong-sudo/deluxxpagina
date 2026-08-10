@@ -39,7 +39,7 @@ export default function CintaBeneficios() {
       <span className="sr-only">
         {FRASES.join(". ")}. {/* contenido real para lectores de pantalla */}
       </span>
-      <div className="flex w-max motion-safe:animate-[marquee_28s_linear_infinite] motion-reduce:animate-none">
+      <div className="flex w-max animate-[marquee_28s_linear_infinite]">
         <Tanda />
         <Tanda />
       </div>

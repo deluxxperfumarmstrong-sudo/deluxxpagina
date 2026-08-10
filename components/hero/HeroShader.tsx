@@ -120,10 +120,6 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
     gl.uniform4fv(u_space, UNIFORMS.space);
     gl.uniform4fv(u_cursor, UNIFORMS.cursor);
 
-    const reducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     let rafId = 0;
     let running = true;
     const startTime = performance.now();
@@ -157,16 +153,12 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
     function handleVisibility() {
       if (document.hidden) {
         cancelAnimationFrame(rafId);
-      } else if (running && !reducedMotion) {
+      } else if (running) {
         rafId = requestAnimationFrame(frame);
       }
     }
 
-    if (reducedMotion) {
-      draw(0);
-    } else {
-      rafId = requestAnimationFrame(frame);
-    }
+    rafId = requestAnimationFrame(frame);
 
     window.addEventListener("resize", resize);
     document.addEventListener("visibilitychange", handleVisibility);

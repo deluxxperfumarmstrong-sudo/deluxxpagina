@@ -104,10 +104,11 @@ body {
   color: var(--color-on-background);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+/* A pedido del cliente, el scroll suave y el resto de las animaciones del
+   sitio no respetan prefers-reduced-motion — antes estaba condicionado
+   igual que el shader/Reveal/CintaBeneficios (ver esos archivos). */
+html {
+  scroll-behavior: smooth;
 }
 
 /* overflow-x: clip (no "hidden") en html Y body: "hidden" fuerza el eje Y a

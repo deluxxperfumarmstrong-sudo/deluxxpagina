@@ -190,16 +190,12 @@ function Frasco({ autoRotar }: { autoRotar: boolean }) {
 }
 
 export default function Frasco3D() {
-  const reducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   return (
     <Canvas
       dpr={[1, 2]}
       camera={{ position: [0, 0, 3.9], fov: 30 }}
       gl={{ alpha: true, antialias: true }}
-      style={{ pointerEvents: "auto", touchAction: "none" }}
+      style={{ pointerEvents: "auto" }}
     >
       <ambientLight intensity={0.55} />
       <directionalLight position={[2.5, 3, 4]} intensity={1.5} />
@@ -207,7 +203,7 @@ export default function Frasco3D() {
       <pointLight position={[0, -1.5, 2]} intensity={0.35} color="#EDEDED" />
 
       <Suspense fallback={null}>
-        <Frasco autoRotar={!reducedMotion} />
+        <Frasco autoRotar />
       </Suspense>
 
       <OrbitControls

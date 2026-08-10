@@ -137,7 +137,12 @@ function Fila({
                       onCambiarStock(producto.id, ml, Number.isNaN(n) ? 0 : n);
                     }}
                     aria-label={`Stock de ${producto.nombre} en ${ml}ml`}
-                    className={`w-14 min-h-9 px-1.5 py-1 text-sm bg-surface border rounded-sm text-on-background focus:outline-none focus:ring-1 focus:ring-accent transition-colors ${
+                    // min-h-[36px], NO min-h-9: el paso 9 está overrideado a
+                    // 128px por la escala custom de globals.css (mismo
+                    // problema que ya se documentó para min-w-9 en el botón
+                    // de arrastre más arriba) — con min-h-9 cada input de
+                    // stock se inflaba a un rectángulo de 128px+ de alto.
+                    className={`w-14 min-h-[36px] px-1.5 py-1 text-sm bg-surface border rounded-sm text-on-background focus:outline-none focus:ring-1 focus:ring-accent transition-colors ${
                       modificado
                         ? "border-warning ring-1 ring-warning/40"
                         : valor === 0

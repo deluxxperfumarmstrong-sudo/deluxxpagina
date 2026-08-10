@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 // Fade + slide sutil al entrar en viewport, con IntersectionObserver —
-// sin librería de animación, consistente con el resto del sitio. Respeta
-// prefers-reduced-motion (motion-reduce: sin transform, aparece directo).
+// sin librería de animación, consistente con el resto del sitio. A pedido
+// del cliente, anima siempre — no respeta prefers-reduced-motion.
 export default function Reveal({
   children,
   delayMs = 0,
@@ -62,8 +62,8 @@ export default function Reveal({
   return (
     <Tag
       ref={ref as React.Ref<HTMLDivElement>}
-      className={`motion-safe:transition-[opacity,transform] motion-safe:duration-700 motion-safe:ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 motion-safe:translate-y-6"
+      className={`transition-[opacity,transform] duration-700 ease-out ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       } ${className}`}
       style={{ transitionDelay: visible ? `${delayMs}ms` : "0ms" }}
     >
