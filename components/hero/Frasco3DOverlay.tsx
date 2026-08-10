@@ -12,17 +12,20 @@ export default function Frasco3DOverlay() {
   return (
     <div
       className="absolute flex items-center justify-center pointer-events-none
-        inset-x-4 top-[calc(var(--header-height,72px)-6px)] h-[42%]
+        inset-x-4 top-[calc(var(--header-height,72px)-6px)] h-[42svh]
         md:inset-x-auto md:right-[6%] md:w-[34%] md:h-[90%]"
     >
       {/* Mobile: frasco arriba, centrado y angosto, con el texto acomodado
           debajo (ver Hero.tsx). Desktop: columna a la derecha, centrada
           verticalmente. El margen de cámara en Frasco3D.tsx ya garantiza
           que no se corte con la tapa en ninguno de los dos casos.
-          touch-none + pointer-events-auto en los dos niveles: sin esto el
-          scroll táctil de la página puede ganarle al drag del OrbitControls
-          en mobile, dejando el 3D como si no respondiera al tacto. */}
-      <div className="w-[92%] h-full md:w-full pointer-events-auto touch-none">
+          Sin touch-none a propósito: bloqueaba el scroll táctil de toda la
+          página con el dedo apoyado sobre el frasco (iOS y Android), y el
+          usuario quedaba "trabado" en el hero. Se prioriza poder scrollear
+          la página por sobre poder rotar el frasco arrastrando con un dedo
+          en mobile — sigue rotando solo, y con mouse en desktop se puede
+          arrastrar igual (touch-action ahí no aplica). */}
+      <div className="w-[92%] h-full md:w-full pointer-events-auto">
         <Frasco3D />
       </div>
     </div>

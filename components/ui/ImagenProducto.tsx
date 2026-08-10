@@ -46,6 +46,13 @@ export default function ImagenProducto({
         alt={nombre}
         fill
         sizes={sizes}
+        // "auto:best" en vez del "auto" por defecto — el cliente pidió la
+        // mejor calidad posible para las fotos de producto (a diferencia
+        // de banners/logo, acá el detalle importa para la decisión de
+        // compra). Sigue siendo un modo "auto" de Cloudinary, no q_100: deja
+        // que Cloudinary elija el archivo más liviano dentro del rango de
+        // máxima fidelidad visual, en vez de mandar siempre el peso máximo.
+        quality="auto:best"
         className="object-cover"
         onError={() => setError(true)}
       />

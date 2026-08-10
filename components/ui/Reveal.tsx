@@ -23,6 +23,19 @@ export default function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // Sin IntersectionObserver (o si el elemento ya está en pantalla al
+    // montar, ej. lo primero que se ve sin scrollear) no dependemos
+    // únicamente del observer para mostrar el contenido.
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const rectInicial = el.getBoundingClientRect();
+    if (rectInicial.top < window.innerHeight && rectInicial.bottom > 0) {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -33,7 +46,17 @@ export default function Reveal({
       { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Red de seguridad: en iOS Safari se vieron casos donde el callback del
+    // observer no llega a dispararse (la barra de direcciones dinámica
+    // cambia el viewport visual mientras se scrollea) y el contenido se
+    // queda en opacity-0 para siempre. Pasado este tiempo se muestra igual.
+    const timeoutId = window.setTimeout(() => setVisible(true), 2000);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   return (

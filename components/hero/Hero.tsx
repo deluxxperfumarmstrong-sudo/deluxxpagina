@@ -5,12 +5,31 @@ import { SLOGAN } from "@/lib/config";
 
 export default function Hero() {
   return (
-    <section className="relative h-screen h-svh w-full overflow-hidden">
+    <section className="relative min-h-screen min-h-svh w-full overflow-hidden">
       <HeroShader>
         <Frasco3DOverlay />
+        {/* Mobile: el bloque de texto arranca justo debajo de la zona del
+            frasco (42svh + alto del header + margen), calculado en vh en vez
+            de heredar "h-full + justify-end" — con ese approach anterior, el
+            texto quedaba anclado al fondo del hero suponiendo que su altura
+            iba a entrar siempre debajo del frasco por casualidad; en cuanto
+            el título creció (9vw → 14vw) dejó de entrar y se solapaba por
+            arriba. Ahora la separación está garantizada por cálculo, no por
+            coincidencia, y como la sección es min-h-svh (no h-svh fijo), si
+            el contenido llegara a necesitar más alto (texto grande de
+            accesibilidad, etc.) la sección crece en vez de recortarlo.
+            pt-, no mt-: este div es el primer hijo en flujo del wrapper
+            "relative z-10" de HeroShader (el frasco es position:absolute,
+            no cuenta) — un margin-top ahí colapsa a través del wrapper (que
+            no tiene padding/borde que lo frene) y termina empujando al
+            wrapper entero para abajo, corriendo con él al frasco 3D
+            (position:absolute, relativo a ese mismo wrapper). padding-top
+            nunca colapsa, así que logra el mismo empujón sin arrastrar nada
+            más — ver Frasco3DOverlay.tsx para el otro lado de este cálculo. */}
         <div
-          className="relative h-full flex flex-col items-start justify-end md:justify-center px-4 md:px-12 pb-12 md:pb-0 max-w-3xl"
-          style={{ paddingTop: "var(--header-height, 72px)" }}
+          className="relative flex flex-col items-start px-4 md:px-12 max-w-3xl
+            pt-[calc(42svh_+_var(--header-height,72px)_+_24px)] pb-10
+            md:pt-[var(--header-height,72px)] md:h-full md:justify-center md:pb-0"
         >
           <h1 className="font-display italic leading-none flex flex-nowrap items-baseline gap-x-2 sm:gap-x-3 drop-shadow-[0_4px_28px_rgba(0,0,0,0.75)]">
             <span className="text-primary text-[14vw] sm:text-5xl md:text-8xl xl:text-9xl">
