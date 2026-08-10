@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Categoria } from "@/lib/types";
 import Reveal from "@/components/ui/Reveal";
+import ImagenCategoria from "./ImagenCategoria";
 
 export default function CategoriasGrid({ categorias }: { categorias: Categoria[] }) {
   if (categorias.length === 0) return null;
@@ -14,35 +14,30 @@ export default function CategoriasGrid({ categorias }: { categorias: Categoria[]
           <Reveal key={cat.slug} delayMs={i * 80}>
           <Link
             href={`/categoria/${cat.slug}`}
-            className="group relative rounded-sm p-6 md:p-8 flex items-end justify-end aspect-square overflow-hidden"
+            className="group relative rounded-sm aspect-square overflow-hidden block"
           >
             <div className="absolute inset-0 z-0">
               {/* Fallback color in case the image fails to load or is not found */}
               <div className="absolute inset-0 bg-surface" />
-              <Image
-                src={`/categorias/${cat.slug}.png`}
-                alt={cat.nombre}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+              <ImagenCategoria slug={cat.slug} nombre={cat.nombre} />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-500" />
             </div>
 
-            <div className="relative z-10 flex items-center gap-2">
-              <span className="font-display text-2xl md:text-3xl text-white group-hover:text-accent transition-colors leading-tight">
+            <div className="absolute z-10 bottom-4 right-4 md:bottom-6 md:right-6 flex items-center gap-1">
+              <span className="font-[var(--font-body)] font-semibold uppercase tracking-wide text-base md:text-lg text-white group-hover:text-accent transition-colors leading-none">
                 {cat.nombre}
               </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="white"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="transition-transform duration-300 group-hover:translate-x-1 group-hover:stroke-accent"
+                className="shrink-0 transition-transform duration-300 group-hover:translate-x-1 group-hover:stroke-accent"
               >
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />

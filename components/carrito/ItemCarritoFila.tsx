@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ItemCarrito } from "@/lib/store/carrito";
 import { useCarrito } from "@/lib/store/carrito";
 import { formatoPrecio } from "@/lib/formato";
+import ImagenProducto from "@/components/ui/ImagenProducto";
 
 export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
   const actualizarCantidad = useCarrito((s) => s.actualizarCantidad);
@@ -12,6 +13,17 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-5 border-b border-border-subtle">
+      <Link
+        href={`/producto/${item.productoSlug}`}
+        className="relative shrink-0 w-20 h-20 overflow-hidden rounded-sm"
+      >
+        <ImagenProducto
+          publicId={item.imagen}
+          nombre={item.nombre}
+          className="absolute inset-0"
+          sizes="80px"
+        />
+      </Link>
       <div className="flex-1 min-w-0">
         <Link
           href={`/producto/${item.productoSlug}`}
@@ -44,8 +56,9 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
           <button
             type="button"
             aria-label="Sumar cantidad"
+            disabled={item.stockMaximo != null && item.cantidad >= item.stockMaximo}
             onClick={() => actualizarCantidad(item.productoSlug, item.ml, item.cantidad + 1)}
-            className="w-11 h-11 text-on-surface hover:text-accent"
+            className="w-11 h-11 text-on-surface hover:text-accent disabled:opacity-30 disabled:hover:text-on-surface"
           >
             +
           </button>

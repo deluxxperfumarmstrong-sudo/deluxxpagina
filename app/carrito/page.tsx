@@ -15,9 +15,18 @@ export default function CarritoPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 md:px-12 py-12 md:py-16">
-      <h1 className="font-display text-3xl md:text-4xl text-on-background mb-8">Carrito</h1>
+      <h1 className="font-display text-3xl md:text-4xl text-on-background mb-8 md:mb-10">Carrito</h1>
 
-      {!montado ? null : items.length === 0 ? (
+      {!montado ? (
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-10">
+          <div className="flex flex-col gap-5">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="h-24 bg-surface animate-pulse" />
+            ))}
+          </div>
+          <div className="h-64 bg-surface animate-pulse" />
+        </div>
+      ) : items.length === 0 ? (
         <div className="py-16 text-center border border-dashed border-border-subtle">
           <p className="text-on-surface-muted mb-4">Tu carrito está vacío.</p>
           <Link

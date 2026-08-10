@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { ENVIOS, PAGOS, WHATSAPP, MILILITROS_VALIDOS } from "@/lib/config";
+import { ENVIOS, PAGOS, MILILITROS_VALIDOS } from "@/lib/config";
 import Acordeon, { type PreguntaFrecuente } from "@/components/soporte/Acordeon";
+import IconoWhatsapp from "@/components/icons/IconoWhatsapp";
+import { generarLinkConsultaWhatsApp } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Soporte",
@@ -62,11 +64,12 @@ export default function SoportePage() {
           </p>
         </div>
         <a
-          href={`https://wa.me/${WHATSAPP.numero}`}
+          href={generarLinkConsultaWhatsApp()}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full text-center md:w-auto md:shrink-0 bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
+          className="w-full flex items-center justify-center gap-2 md:w-auto md:shrink-0 bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
         >
+          <IconoWhatsapp className="w-4 h-4" />
           Escribir por WhatsApp
         </a>
       </div>

@@ -2,40 +2,75 @@
 
 import { useMemo, useState } from "react";
 import type { Producto } from "@/lib/types";
-import { precioPorMl, calcularSena } from "@/lib/precio";
+import { precioPorMl, precioListaPorMl, porcentajeDescuento, calcularSena } from "@/lib/precio";
+import { limitaPorStock, stockPorMl } from "@/lib/stock";
 import { useCarrito } from "@/lib/store/carrito";
+import { useCarritoUI } from "@/lib/store/carritoUI";
+import { generarLinkMuestraWhatsApp } from "@/lib/whatsapp";
 import MlSelector from "./MlSelector";
 import PrecioBloque from "./PrecioBloque";
 import { BadgeTipo, BadgeMuestra } from "./Badges";
+import IconoWhatsapp from "@/components/icons/IconoWhatsapp";
 
 export default function FichaProducto({ producto }: { producto: Producto }) {
   const mililitrosOrdenados = useMemo(
     () => [...producto.mililitros].sort((a, b) => a - b),
     [producto.mililitros]
   );
-  const [ml, setMl] = useState(mililitrosOrdenados[0]);
+  const [ml, setMl] = useState(
+    () =>
+      mililitrosOrdenados.find((m) => !limitaPorStock(producto) || stockPorMl(producto, m) > 0) ??
+      mililitrosOrdenados[0]
+  );
   const [cantidad, setCantidad] = useState(1);
   const [agregado, setAgregado] = useState(false);
   const agregarItem = useCarrito((s) => s.agregarItem);
+  const abrirCarrito = useCarritoUI((s) => s.abrir);
+  const mostrarToast = useCarritoUI((s) => s.mostrarToast);
 
   const precio = precioPorMl(producto, ml);
+  const precioOriginal = precioListaPorMl(producto, ml);
+  const porcentajeOff = porcentajeDescuento(producto, ml);
   const sena = calcularSena(producto, ml);
+  const stockLimita = limitaPorStock(producto);
+  const stockDisponible = stockPorMl(producto, ml);
+  const sinStock = stockLimita && stockDisponible <= 0;
+  const cantidadMaxima = stockLimita ? stockDisponible : Infinity;
+
+  function handleSeleccionarMl(nuevoMl: number) {
+    setMl(nuevoMl);
+    const maximoNuevo = stockLimita ? stockPorMl(producto, nuevoMl) : Infinity;
+    setCantidad((c) => Math.max(1, Math.min(c, maximoNuevo)));
+  }
 
   function handleAgregar() {
+    if (sinStock) return;
+    const carritoEstabaVacio = useCarrito.getState().items.length === 0;
     agregarItem(
       {
         productoSlug: producto.slug,
         nombre: producto.nombre,
+        imagen: producto.imagenes[0],
         categoriaNombre: producto.categoria.nombre,
         tipo: producto.tipo,
         ml,
         precioUnitario: precio,
         tieneSena: sena != null,
         senaUnitaria: sena ?? 0,
+        stockMaximo: stockLimita ? stockDisponible : null,
       },
-      cantidad
+      Math.min(cantidad, cantidadMaxima)
     );
     setAgregado(true);
+    // La vista previa solo se abre sola con el primer producto del
+    // carrito — de ahí en más el cliente sigue comprando sin interrupción,
+    // y cada "agregar" siguiente avisa con un toast en vez de reabrir el
+    // panel grande (salvo que ya esté abierto, ahí ya se ve reflejado solo).
+    if (carritoEstabaVacio) {
+      abrirCarrito();
+    } else if (!useCarritoUI.getState().abierto) {
+      mostrarToast();
+    }
     setTimeout(() => setAgregado(false), 2000);
   }
 
@@ -64,17 +99,46 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
         </div>
       )}
 
-      <MlSelector opciones={mililitrosOrdenados} seleccionado={ml} onSeleccionar={setMl} />
+      <MlSelector
+        opciones={mililitrosOrdenados}
+        seleccionado={ml}
+        onSeleccionar={handleSeleccionarMl}
+        stockPorMl={stockLimita ? producto.stock : undefined}
+      />
 
-      <PrecioBloque precio={precio} sena={sena} />
+      <PrecioBloque
+        precio={precio}
+        precioOriginal={porcentajeOff != null ? precioOriginal : null}
+        porcentajeOff={porcentajeOff}
+        sena={sena}
+      />
+
+      {stockLimita && (
+        <p
+          className={`text-xs -mt-4 ${
+            sinStock
+              ? "text-error"
+              : stockDisponible === 1
+                ? "text-warning font-semibold"
+                : "text-on-surface-muted"
+          }`}
+        >
+          {sinStock
+            ? "Sin stock en este tamaño."
+            : stockDisponible === 1
+              ? `¡Última unidad en ${ml}ml!`
+              : `${stockDisponible} disponibles en ${ml}ml.`}
+        </p>
+      )}
 
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="flex items-center justify-between sm:justify-start border border-border">
           <button
             type="button"
             aria-label="Restar cantidad"
+            disabled={sinStock}
             onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent"
+            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent disabled:opacity-30 disabled:hover:text-on-surface"
           >
             −
           </button>
@@ -84,8 +148,9 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
           <button
             type="button"
             aria-label="Sumar cantidad"
-            onClick={() => setCantidad((c) => c + 1)}
-            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent"
+            disabled={sinStock || cantidad >= cantidadMaxima}
+            onClick={() => setCantidad((c) => Math.min(c + 1, cantidadMaxima))}
+            className="w-14 sm:w-11 h-12 text-on-surface hover:text-accent disabled:opacity-30 disabled:hover:text-on-surface"
           >
             +
           </button>
@@ -94,15 +159,28 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
         <button
           type="button"
           onClick={handleAgregar}
-          className={`sm:flex-1 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] transition-colors ${
+          disabled={sinStock}
+          className={`sm:flex-1 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
             agregado
               ? "bg-success text-on-primary"
               : "bg-primary text-on-primary hover:bg-[#E8E8E8]"
           }`}
         >
-          {agregado ? "Agregado ✓" : "Agregar al carrito"}
+          {agregado ? "Agregado ✓" : sinStock ? "Sin stock" : "Agregar al carrito"}
         </button>
       </div>
+
+      {producto.tieneMuestra && (
+        <a
+          href={generarLinkMuestraWhatsApp(producto.nombre)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm text-accent-text hover:underline w-fit"
+        >
+          <IconoWhatsapp className="w-4 h-4" />
+          ¿Querés probarla antes? Pedí una muestra por WhatsApp
+        </a>
+      )}
 
       {producto.descripcion && (
         <p className="text-on-surface-muted leading-relaxed">{producto.descripcion}</p>

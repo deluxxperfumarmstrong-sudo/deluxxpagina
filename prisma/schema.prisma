@@ -33,16 +33,26 @@ model Producto {
   notas        String?
   tipo         TipoProducto @default(STOCK)
   precios      Json
+  // Precio con descuento por tamaño — mismas claves que `precios` (ml en
+  // string), pero opcional: un ml sin entrada acá (o con un valor que no es
+  // menor al de `precios`) simplemente no tiene descuento aplicado.
+  preciosDescuento Json @default("{}")
   mililitros   Int[]
-  cantidad     Int          @default(0)
+  // Stock por tamaño — claves = ml (string), igual que `precios`. Solo es un
+  // límite real para tipo STOCK; ENCARGO se fabrica a pedido y no se acota.
+  stock        Json         @default("{}")
   imagenes     String[]
   tieneMuestra Boolean      @default(false)
   activo       Boolean      @default(true)
   destacado    Boolean      @default(false)
+  // Orden manual (drag & drop) desde el panel de admin — controla el orden
+  // dentro de /admin/productos, no el orden público del catálogo.
+  orden        Int          @default(0)
   createdAt    DateTime     @default(now())
   categoriaId  String
   categoria    Categoria    @relation(fields: [categoriaId], references: [id])
 
   @@index([categoriaId])
   @@index([tipo])
+  @@index([orden])
 }

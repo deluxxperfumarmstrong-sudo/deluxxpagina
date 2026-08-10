@@ -1,6 +1,8 @@
 // Datos de negocio pendientes de confirmar con el cliente — ver docs/BLOQUEOS.md.
 // Reemplazar estos placeholders antes de ir a producción (Fase 7).
 
+export const SLOGAN = "Encontrá tu aroma, definí tu estilo.";
+
 export const SITE = {
   nombre: "Deluxx Perfum",
   descripcion:
@@ -11,6 +13,11 @@ export const SITE = {
 
 export const WHATSAPP = {
   numero: "5493471610346",
+};
+
+export const INSTAGRAM = {
+  usuario: "deluxx_perfum",
+  url: "https://www.instagram.com/deluxx_perfum/",
 };
 
 export const ENVIOS = {
@@ -33,6 +40,11 @@ export const PAGOS = {
 // escala propia (3/5/10 ml) — sin definición del cliente, se reutiliza esta
 // misma escala también para decants por simplicidad (ver docs/BLOQUEOS.md).
 export const MILILITROS_VALIDOS = [50, 55, 75, 90, 100, 120, 150, 200] as const;
+
+// Tope de productos "Destacado" — el home solo pide 9 (ver app/page.tsx) y
+// de esos, el 9° queda oculto en mobile (ver DestacadosGrid): un décimo
+// marcado no rompe nada, pero nunca se ve, así que el admin avisa antes.
+export const MAX_DESTACADOS = 9;
 
 export const CATEGORIAS_SEED = [
   { nombre: "Árabe", slug: "perfumeria-arabe" },

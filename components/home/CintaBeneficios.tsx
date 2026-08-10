@@ -16,11 +16,11 @@ function Tanda() {
     <div className="flex items-center shrink-0" aria-hidden="true">
       {FRASES.map((frase, i) => (
         <span key={i} className="flex items-center shrink-0">
-          <span className="font-[var(--font-body)] font-semibold uppercase tracking-wide text-sm md:text-base text-on-primary px-6 md:px-8 whitespace-nowrap">
+          <span className="font-[var(--font-body)] font-semibold uppercase tracking-wide text-xs md:text-sm text-on-primary px-5 md:px-6 whitespace-nowrap">
             {frase}
           </span>
-          <span className="text-accent text-lg" aria-hidden="true">
-            ✦
+          <span className="text-accent text-base" aria-hidden="true">
+            •
           </span>
         </span>
       ))}
@@ -28,9 +28,14 @@ function Tanda() {
   );
 }
 
+// Sticky: se fija justo debajo del header (fixed) y queda a la vista
+// mientras se hace scroll por Categorías y Destacados — el contenedor
+// relative que la envuelve en page.tsx (Cinta + Categorías + Destacados)
+// es lo que le da el "recorrido" en el que puede quedar pegada; al
+// terminar ese bloque, sigue el flujo normal como cualquier otra sección.
 export default function CintaBeneficios() {
   return (
-    <div className="relative bg-primary border-y border-border-subtle py-3 md:py-4 overflow-hidden">
+    <div className="sticky top-[var(--header-height,72px)] z-30 bg-primary border-y border-border-subtle py-1.5 md:py-2 overflow-hidden">
       <span className="sr-only">
         {FRASES.join(". ")}. {/* contenido real para lectores de pantalla */}
       </span>

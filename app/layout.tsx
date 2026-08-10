@@ -3,6 +3,7 @@ import { Anton, Archivo } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "@/components/layout/SiteChrome";
 import { SITE } from "@/lib/config";
+import { getCategoriasActivas } from "@/lib/data";
 
 const anton = Anton({
   variable: "--font-anton",
@@ -38,14 +39,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Las categorías del menú salen de la base, no de CATEGORIAS_SEED: el seed
+  // incluye categorías que pueden estar desactivadas o sin productos activos
+  // (ej. "Kits"), y esas no existen para el sitio público — enlazarlas desde
+  // el nav era mandar al cliente a una categoría vacía.
+  const categorias = await getCategoriasActivas();
+
   return (
     <html
       lang="es"
       className={`${anton.variable} ${archivo.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-on-background">
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome categorias={categorias.map((c) => ({ nombre: c.nombre, slug: c.slug }))}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

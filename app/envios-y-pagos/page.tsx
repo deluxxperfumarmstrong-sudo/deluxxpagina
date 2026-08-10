@@ -19,7 +19,7 @@ const NOTA_METODO: Record<string, string> = {
 export default function EnviosYPagosPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 md:px-12 py-12 md:py-16">
-      <h1 className="font-display text-4xl md:text-5xl text-on-background mb-12 md:mb-16">
+      <h1 className="font-display text-4xl md:text-5xl text-on-background mb-8 md:mb-10">
         Envíos y pagos
       </h1>
 
@@ -27,8 +27,8 @@ export default function EnviosYPagosPage() {
         {/* Envíos */}
         <Reveal as="section" className="bg-surface rounded-sm p-6 md:p-8 flex flex-col gap-6">
           <div className="flex items-center gap-4">
-            <div className="shrink-0 w-14 h-14 rounded-sm bg-surface-raised flex items-center justify-center text-accent">
-              <IconoCamion className="w-7 h-7" />
+            <div className="shrink-0 text-accent">
+              <IconoCamion className="w-10 h-10" />
             </div>
             <h2 className="font-display text-2xl text-on-background">Envíos</h2>
           </div>
@@ -62,8 +62,8 @@ export default function EnviosYPagosPage() {
           className="bg-surface rounded-sm p-6 md:p-8 flex flex-col gap-6"
         >
           <div className="flex items-center gap-4">
-            <div className="shrink-0 w-14 h-14 rounded-sm bg-surface-raised flex items-center justify-center text-accent">
-              <IconoBillete className="w-7 h-7" />
+            <div className="shrink-0 text-accent">
+              <IconoBillete className="w-10 h-10" />
             </div>
             <h2 className="font-display text-2xl text-on-background">Pagos</h2>
           </div>

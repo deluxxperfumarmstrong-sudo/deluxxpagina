@@ -1,4 +1,4 @@
-import { MILILITROS_VALIDOS, CATEGORIAS_SEED } from "@/lib/config";
+import { MILILITROS_VALIDOS, CATEGORIAS_SEED, MAX_DESTACADOS } from "@/lib/config";
 import type { Categoria, Producto, TipoProducto } from "@/lib/types";
 
 // Generador determinístico de catálogo mock (Fase 2). Nombres inventados —
@@ -108,8 +108,21 @@ function generarProductosCategoria(
 
     const multiplicador = 90 + ((i * 7) % 60); // variación de precio 90%–150%
     const precios: Record<string, number> = {};
+    const preciosDescuento: Record<string, number> = {};
+    const stock: Record<string, number> = {};
     for (const ml of mililitros) {
-      precios[String(ml)] = precioParaProducto(ml, multiplicador);
+      const precio = precioParaProducto(ml, multiplicador);
+      precios[String(ml)] = precio;
+      // Varía por tamaño (índice) además de por producto, para que la UI de
+      // stock por ml tenga datos realistas (algunos tamaños más escasos que
+      // otros). ENCARGO no tiene límite físico real — queda en 0.
+      stock[String(ml)] = tipo === "STOCK" ? ((i + ml) % 12) : 0;
+      // Un producto de cada 5 tiene descuento, solo en su primer tamaño —
+      // así el catálogo mock tiene ejemplos reales del precio tachado sin
+      // que todos los productos lo muestren.
+      if (i % 5 === 0 && ml === mililitros[0]) {
+        preciosDescuento[String(ml)] = Math.round((precio * 0.8) / 100) * 100;
+      }
     }
 
     productos.push({
@@ -120,12 +133,16 @@ function generarProductosCategoria(
       notas: NOTAS_BASE[i % NOTAS_BASE.length],
       tipo,
       precios,
+      preciosDescuento,
       mililitros,
-      cantidad: tipo === "STOCK" ? 5 + (i % 10) : 0,
+      stock,
       imagenes: [`deluxx/productos/${slug}-1`, `deluxx/productos/${slug}-2`],
       tieneMuestra: i % 4 !== 0,
       activo: true,
       destacado: i % 7 === 0,
+      // Placeholder — generarCatalogoMock() lo reasigna a un índice GLOBAL
+      // después de concatenar todas las categorías (ver ahí el porqué).
+      orden: i,
       createdAt: new Date(2026, 0, 1 + (i % 28)),
       categoriaId,
       categoria: undefined as unknown as Categoria,
@@ -159,6 +176,28 @@ export function generarCatalogoMock(): { categorias: Categoria[]; productos: Pro
       p.categoria = cat;
       productos.push(p);
     }
+  }
+
+  // `orden` tiene que ser único entre TODOS los productos, no solo dentro de
+  // su categoría — generarProductosCategoria reinicia su índice en 0 por
+  // cada categoría, así que sin este paso 86 productos terminaban con solo
+  // ~30 valores de orden distintos (repetidos 3 veces), y /admin/productos
+  // los mostraba intercalados en grupos de a 3 categorías antes de que el
+  // admin arrastrara nada.
+  productos.forEach((p, i) => {
+    p.orden = i;
+  });
+
+  // `destacado: i % 7 === 0` de generarProductosCategoria es local a cada
+  // categoría — sumadas las 3 categorías con productos, eso pasa fácil de
+  // MAX_DESTACADOS (el límite real que /admin/productos hace cumplir). Se
+  // capa acá, después de juntar todo, en vez de intentar coordinarlo entre
+  // categorías.
+  let destacadosVistos = 0;
+  for (const p of productos) {
+    if (!p.destacado) continue;
+    destacadosVistos++;
+    if (destacadosVistos > MAX_DESTACADOS) p.destacado = false;
   }
 
   return { categorias, productos };

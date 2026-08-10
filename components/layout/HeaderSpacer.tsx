@@ -11,6 +11,6 @@ export default function HeaderSpacer() {
   const pathname = usePathname();
   if (pathname === "/") return null;
   return (
-    <div style={{ height: "var(--header-height, 88px)" }} aria-hidden="true" />
+    <div style={{ height: "var(--header-height, 72px)" }} aria-hidden="true" />
   );
 }

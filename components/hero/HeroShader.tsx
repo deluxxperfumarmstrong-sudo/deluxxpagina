@@ -4,24 +4,33 @@ import { useEffect, useRef, useState } from "react";
 import { FRAGMENT_SHADER, VERTEX_SHADER } from "./shaders";
 
 // Re-tinte de marca sobre el shader "Plasma" original (shaders.ts, sin
-// modificar) — valores del §5 del PRD. u_colors[8] existe en el shader para
-// soportar hasta 8 paradas; acá solo se llenan 5 (el resto queda en 0,0,0 y
-// nunca se usa porque u_scene.w = 5.0 le dice a palette() que corte ahí).
+// modificar) — valores del §5 del PRD. u_colors[8] es el máximo que soporta
+// el shader (array fijo en GLSL) — acá se usan las 8 paradas disponibles,
+// el máximo margen posible para angostar el rojo sin tocar shaders.ts.
 // u_hue = 0.0 y u_oklab = 1.0 son NO negociables: si se tocan, el rojo de
 // marca sale cyan (hue) o pasa por marrones sucios en la mezcla (oklab).
 // #0A0A0A (negro puro) no es un token de design.md. El extremo oscuro de la
 // rampa usa `background` (#3A3A3D) — el mismo gris metálico del resto del
 // sitio — en vez de negro o de surface-raised, que sigue leyendo casi negro.
+// Tres paradas de gris seguidas antes del rojo y otra después: el rojo pasa
+// a ocupar solo 2 de los 7 tramos de la rampa (antes eran 2 de 6), la
+// fracción más angosta posible con 8 paradas — el gris domina el resto.
 const COLORS: [number, number, number][] = [
   [0.227, 0.227, 0.239], // #3A3A3D background
   [0.165, 0.165, 0.173], // #2A2A2C surface
   [0.333, 0.333, 0.353], // #55555A surface-metallic
-  [0.831, 0.137, 0.157], // #D42328 accent — filamento rojo (75% de la rampa)
+  [0.333, 0.333, 0.353], // #55555A surface-metallic (sostiene el gris)
+  [0.333, 0.333, 0.353], // #55555A surface-metallic (sostiene el gris)
+  [0.831, 0.137, 0.157], // #D42328 accent — veta fina, el mínimo posible
+  [0.333, 0.333, 0.353], // #55555A surface-metallic — vuelve a gris apenas pasa el rojo
   [0.929, 0.929, 0.929], // #EDEDED on-surface
 ];
 
 const UNIFORMS = {
-  shape: [1.5, 0.48, 0.5, 0.0],
+  // shape.x (escala) sube de 1.5 a 1.75: el mismo patrón se ve con ondas
+  // más chicas y numerosas, así que toda veta de color —incluida la
+  // roja— queda más fina en pantalla, no solo por la rampa de colores.
+  shape: [1.75, 0.48, 0.5, 0.0],
   // surface.z (brillo) baja de -0.5 (preset original) a -0.12: con -0.5 el
   // shader resta 0.5 a cada canal DESPUÉS de armar la paleta, así que
   // cualquier gris de la rampa (todos < 0.5) terminaba en negro puro sin
@@ -132,7 +141,7 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
 
     function draw(seconds: number) {
       resize();
-      gl!.uniform4f(u_scene, canvas!.width, canvas!.height, seconds * 0.86, 5.0);
+      gl!.uniform4f(u_scene, canvas!.width, canvas!.height, seconds * 0.86, 8.0);
       gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     }
 

@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generarCatalogoMock } from "../lib/mock/generar-productos";
-import { validarCoherenciaPreciosMl } from "../lib/validacion";
+import { validarCoherenciaPreciosMl, validarCoherenciaStockMl } from "../lib/validacion";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +11,7 @@ async function main() {
   // sin precio (o un precio sin tamaño).
   for (const producto of productos) {
     validarCoherenciaPreciosMl(producto);
+    validarCoherenciaStockMl(producto);
   }
 
   console.log(`Sembrando ${categorias.length} categorías y ${productos.length} productos...`);
@@ -19,9 +20,11 @@ async function main() {
   for (const cat of categorias) {
     const creada = await prisma.categoria.upsert({
       where: { slug: cat.slug },
+      // `orden` NO va acá: es curación manual del admin (arrastre en
+      // /admin/categorias). Volver a correr el seed no debería revertirla —
+      // solo se setea en `create`, para una categoría nueva.
       update: {
         nombre: cat.nombre,
-        orden: cat.orden,
         activa: cat.activa,
       },
       create: {
@@ -40,14 +43,20 @@ async function main() {
 
     await prisma.producto.upsert({
       where: { slug: p.slug },
+      // `destacado` y `orden` NO van en `update`: son curación manual hecha
+      // desde el admin (checkbox "Destacado" y arrastre en
+      // /admin/productos). Antes se pisaban en cada re-corrida del seed
+      // (paso documentado de deploy) sin ningún aviso — solo tienen sentido
+      // como valor inicial en `create`, para un producto que recién se siembra.
       update: {
         nombre: p.nombre,
         descripcion: p.descripcion,
         notas: p.notas,
         tipo: p.tipo,
         precios: p.precios,
+        preciosDescuento: p.preciosDescuento,
         mililitros: p.mililitros,
-        cantidad: p.cantidad,
+        stock: p.stock,
         imagenes: p.imagenes,
         tieneMuestra: p.tieneMuestra,
         activo: p.activo,
@@ -60,11 +69,14 @@ async function main() {
         notas: p.notas,
         tipo: p.tipo,
         precios: p.precios,
+        preciosDescuento: p.preciosDescuento,
         mililitros: p.mililitros,
-        cantidad: p.cantidad,
+        stock: p.stock,
         imagenes: p.imagenes,
         tieneMuestra: p.tieneMuestra,
         activo: p.activo,
+        destacado: p.destacado,
+        orden: p.orden,
         categoriaId,
       },
     });

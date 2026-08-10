@@ -19,18 +19,27 @@ export type Producto = {
   notas: string | null;
   tipo: TipoProducto;
   precios: Record<string, number>;
+  preciosDescuento: Record<string, number>;
   mililitros: number[];
-  cantidad: number;
+  stock: Record<string, number>;
   imagenes: string[];
   tieneMuestra: boolean;
   activo: boolean;
   // Curado a mano desde el admin — decide qué aparece en "Destacados" del
   // home (antes eran simplemente los más recientes).
   destacado: boolean;
+  // Orden manual (drag & drop) en /admin/productos — no es el orden público
+  // del catálogo, que sigue siendo por fecha/precio (ver CatalogoFiltros).
+  orden: number;
   createdAt: Date;
   categoriaId: string;
   categoria: Categoria;
 };
+
+// Lo mínimo que el nav necesita de una categoría. Se arma en el layout
+// (server) desde getCategoriasActivas y baja a Header/MenuMovil, que son
+// client components y no pueden consultar la base por su cuenta.
+export type CategoriaNav = { nombre: string; slug: string };
 
 export type CatalogoFiltros = {
   categoriaSlug?: string;

@@ -110,6 +110,19 @@ body {
   }
 }
 
+/* overflow-x: clip (no "hidden") en html Y body: "hidden" fuerza el eje Y a
+   "auto" en el elemento que no lo tenga puesto (regla del spec), y eso
+   convertía a body en un segundo contenedor de scroll — ahí position:sticky
+   se rompía porque quedaba referenciando el scroll de body, que nunca es
+   el que se mueve visualmente (el que se mueve es html). "clip" recorta
+   el desborde horizontal igual que "hidden" pero está explícitamente
+   exceptuado de esa regla, así que no le toca el overflow-y a nadie. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;

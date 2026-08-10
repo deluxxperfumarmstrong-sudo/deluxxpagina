@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { getProductosAdmin } from "@/lib/data";
-import { formatoPrecio } from "@/lib/formato";
-import { precioDesde } from "@/lib/precio";
-import BotonEliminar from "./BotonEliminar";
+import ProductosOrdenables from "@/components/admin/ProductosOrdenables";
 
 export default async function AdminProductosPage() {
   const productos = await getProductosAdmin();
@@ -22,63 +20,7 @@ export default async function AdminProductosPage() {
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs uppercase tracking-widest text-on-surface-muted border-b border-border-subtle">
-              <th className="py-3 pr-4">Nombre</th>
-              <th className="py-3 pr-4">Categoría</th>
-              <th className="py-3 pr-4">Tipo</th>
-              <th className="py-3 pr-4">Desde</th>
-              <th className="py-3 pr-4">Estado</th>
-              <th className="py-3 pr-4 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productos.map((p) => (
-              <tr key={p.id} className="border-b border-border-subtle">
-                <td className="py-3 pr-4 text-on-background font-semibold">
-                  <span className="inline-flex items-center gap-1.5">
-                    {p.destacado && (
-                      <span className="text-warning" title="Destacado" aria-label="Destacado">
-                        ★
-                      </span>
-                    )}
-                    {p.nombre}
-                  </span>
-                </td>
-                <td className="py-3 pr-4 text-on-surface-muted">{p.categoria.nombre}</td>
-                <td className="py-3 pr-4 text-on-surface-muted">
-                  {p.tipo === "ENCARGO" ? "Encargo" : "Stock"}
-                </td>
-                <td className="py-3 pr-4 text-on-surface-muted">
-                  {formatoPrecio(precioDesde(p))}
-                </td>
-                <td className="py-3 pr-4">
-                  <span
-                    className={`text-xs uppercase tracking-wide px-2 py-1 rounded-full bg-surface-raised ${
-                      p.activo ? "text-success" : "text-on-surface-muted"
-                    }`}
-                  >
-                    {p.activo ? "Activo" : "Inactivo"}
-                  </span>
-                </td>
-                <td className="py-3 pr-4">
-                  <div className="flex items-center justify-end gap-3">
-                    <Link
-                      href={`/admin/productos/${p.id}`}
-                      className="text-on-surface hover:text-accent transition-colors"
-                    >
-                      Editar
-                    </Link>
-                    <BotonEliminar id={p.id} nombre={p.nombre} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ProductosOrdenables productosIniciales={productos} />
     </div>
   );
 }

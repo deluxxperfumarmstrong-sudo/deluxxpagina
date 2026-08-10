@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_LINKS } from "@/lib/config";
+import type { CategoriaNav } from "@/lib/types";
 
-export default function MenuMovil() {
+export default function MenuMovil({ categorias }: { categorias: CategoriaNav[] }) {
   const [abierto, setAbierto] = useState(false);
+  const [catalogoAbierto, setCatalogoAbierto] = useState(false);
   const contenedorRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -31,6 +33,12 @@ export default function MenuMovil() {
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
+  }, [abierto]);
+
+  // El submenú de Catálogo arranca cerrado cada vez que se abre el menú
+  // de nuevo, en vez de recordar el estado de la vez anterior.
+  useEffect(() => {
+    if (!abierto) setCatalogoAbierto(false);
   }, [abierto]);
 
   return (
@@ -74,15 +82,73 @@ export default function MenuMovil() {
       >
         {NAV_LINKS.map((link) => {
           const activo = pathname === link.href || pathname.startsWith(`${link.href}/`);
+          const linkClassName = `flex items-center min-h-11 py-2.5 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide transition-colors hover:text-accent ${
+            activo ? "text-accent-text" : "text-on-background"
+          }`;
+
+          // Sin categorías activas no se muestra el botón de desplegar (ver
+          // el mismo criterio en Header.tsx).
+          if (link.href === "/catalogo" && categorias.length > 0) {
+            return (
+              <div key={link.href}>
+                <div className="flex items-center">
+                  <Link
+                    href={link.href}
+                    onClick={() => setAbierto(false)}
+                    aria-current={activo ? "page" : undefined}
+                    className={`flex-1 ${linkClassName}`}
+                  >
+                    {link.label}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setCatalogoAbierto((v) => !v)}
+                    aria-label={catalogoAbierto ? "Ocultar categorías" : "Mostrar categorías"}
+                    aria-expanded={catalogoAbierto}
+                    className="flex items-center justify-center min-w-11 min-h-11 text-on-background hover:text-accent transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${catalogoAbierto ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                </div>
+                {catalogoAbierto && (
+                  <div className="flex flex-col pb-1">
+                    {categorias.map((cat) => (
+                      <Link
+                        key={cat.slug}
+                        href={`/categoria/${cat.slug}`}
+                        onClick={() => setAbierto(false)}
+                        className="flex items-center min-h-11 py-2 pl-4 text-sm text-on-surface-muted hover:text-accent transition-colors"
+                      >
+                        {cat.nombre}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setAbierto(false)}
               aria-current={activo ? "page" : undefined}
-              className={`flex items-center min-h-11 py-2.5 font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide transition-colors hover:text-accent ${
-                activo ? "text-accent-text" : "text-on-background"
-              }`}
+              className={linkClassName}
             >
               {link.label}
             </Link>
