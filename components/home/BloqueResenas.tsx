@@ -2,13 +2,30 @@
 
 import { InfiniteMovingCards, type InfiniteMovingCardItem } from "@/components/ui/infinite-moving-cards";
 
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_CONFIGURADO = !!CLOUD_NAME && CLOUD_NAME !== "dxxxxxx";
+
+// `image` guarda el public_id de Cloudinary (deluxx/testimonios/{slug}), no
+// una ruta — esto no es un componente de imagen de Next (es un
+// background-image plano para el recorte con background-size/position de
+// renderTestimonio), así que se arma la URL de entrega a mano en vez de
+// pasar por CldImage. f_auto,q_auto: formato y calidad automáticos según el
+// navegador, mismo criterio que usaría next-cloudinary por defecto. Si
+// Cloudinary no está configurado, cae al PNG local en public/testimonios/
+// (mismos nombres de archivo, subidos ahí antes de tener cuenta).
+function urlTestimonio(publicId: string) {
+  if (!CLOUDINARY_CONFIGURADO) return `/testimonios/${publicId.split("/").pop()}.png`;
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto,q_auto/${publicId}`;
+}
+
 // Capturas reales de reseñas de Google, provistas por el cliente
-// (ver public/testimonios/). `description` se usa solo para el texto
-// accesible (sr-only) — lo que se ve en pantalla es la imagen tal cual.
+// (ver public/testimonios/ y deluxx/testimonios/ en Cloudinary).
+// `description` se usa solo para el texto accesible (sr-only) — lo que se
+// ve en pantalla es la imagen tal cual.
 const RESENAS: InfiniteMovingCardItem[] = [
   {
     id: 1,
-    image: "/testimonios/cecilia-merlo.png",
+    image: "deluxx/testimonios/cecilia-merlo",
     name: "Cecilia Merlo",
     rating: 5,
     description:
@@ -16,7 +33,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 2,
-    image: "/testimonios/elias-santoni.png",
+    image: "deluxx/testimonios/elias-santoni",
     name: "Elías Santoni",
     rating: 5,
     description:
@@ -24,14 +41,14 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 3,
-    image: "/testimonios/marcelo-reynoso.png",
+    image: "deluxx/testimonios/marcelo-reynoso",
     name: "Marcelo Reynoso",
     rating: 5,
     description: "Excelentes productos! Calidad y precio..muy recomendable, excelente atención!",
   },
   {
     id: 4,
-    image: "/testimonios/pablo-civiriati.png",
+    image: "deluxx/testimonios/pablo-civiriati",
     name: "Pablo Civiriati",
     rating: 5,
     description:
@@ -39,7 +56,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 5,
-    image: "/testimonios/pablo-savino.png",
+    image: "deluxx/testimonios/pablo-savino",
     name: "Pablo Savino",
     rating: 5,
     description:
@@ -47,7 +64,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 6,
-    image: "/testimonios/seba-vagni.png",
+    image: "deluxx/testimonios/seba-vagni",
     name: "Seba Vagni",
     rating: 5,
     description:
@@ -55,7 +72,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 7,
-    image: "/testimonios/sergio-bellino.png",
+    image: "deluxx/testimonios/sergio-bellino",
     name: "Sergio Bellino",
     rating: 5,
     description:
@@ -63,7 +80,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
   },
   {
     id: 8,
-    image: "/testimonios/sofia-gonzales.png",
+    image: "deluxx/testimonios/sofia-gonzales",
     name: "Sofía González",
     rating: 5,
     description:
@@ -81,6 +98,7 @@ const RESENAS: InfiniteMovingCardItem[] = [
 const ASPECT_RATIO = "590 / 381";
 
 function renderTestimonio(r: InfiniteMovingCardItem) {
+  if (!r.image) return null;
   return (
     <div
       role="img"
@@ -88,7 +106,7 @@ function renderTestimonio(r: InfiniteMovingCardItem) {
       className="h-56 md:h-64 rounded-sm bg-surface-raised"
       style={{
         aspectRatio: ASPECT_RATIO,
-        backgroundImage: `url(${r.image})`,
+        backgroundImage: `url(${urlTestimonio(r.image)})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

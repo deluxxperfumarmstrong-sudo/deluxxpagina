@@ -7,8 +7,7 @@ export const SITE = {
   nombre: "Deluxx Perfum",
   descripcion:
     "Perfumería árabe, de nicho, de diseñador y kits. Pedidos por encargo y en stock.",
-  // TODO: reemplazar por el dominio real de producción antes del deploy.
-  url: "https://deluxxperfum.vercel.app",
+  url: "https://deluxxpagina.vercel.app",
 };
 
 export const WHATSAPP = {
