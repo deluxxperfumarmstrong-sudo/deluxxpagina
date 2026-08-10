@@ -5,7 +5,7 @@ import { SLOGAN } from "@/lib/config";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen min-h-svh w-full overflow-hidden">
+    <section className="relative h-screen h-svh w-full overflow-hidden">
       <HeroShader>
         <Frasco3DOverlay />
         {/* Mobile: el bloque de texto arranca justo debajo de la zona del
@@ -15,9 +15,14 @@ export default function Hero() {
             iba a entrar siempre debajo del frasco por casualidad; en cuanto
             el título creció (9vw → 14vw) dejó de entrar y se solapaba por
             arriba. Ahora la separación está garantizada por cálculo, no por
-            coincidencia, y como la sección es min-h-svh (no h-svh fijo), si
-            el contenido llegara a necesitar más alto (texto grande de
-            accesibilidad, etc.) la sección crece en vez de recortarlo.
+            coincidencia.
+            La sección de arriba es h-svh (alto fijo), no min-h-svh: se
+            probó min-h-svh para que creciera si el contenido necesitaba más
+            alto, pero un h-full en un hijo de un contenedor con solo
+            min-height (sin height) no se puede resolver contra el padre y
+            colapsa al alto de SU contenido — eso rompía el shader y el
+            centrado vertical en desktop (el canvas y este mismo div, ambos
+            h-full, se encogían a la mitad de la pantalla en vez de llenarla).
             pt-, no mt-: este div es el primer hijo en flujo del wrapper
             "relative z-10" de HeroShader (el frasco es position:absolute,
             no cuenta) — un margin-top ahí colapsa a través del wrapper (que
