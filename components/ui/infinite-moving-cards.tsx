@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  motion,
-  useAnimationFrame,
-  useMotionValue,
-  useReducedMotion,
-} from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type InfiniteMovingCardItem = {
@@ -74,7 +69,6 @@ export function InfiniteMovingCards<
   maskColor = "background",
   renderItem,
 }: InfiniteMovingCardsProps<T>) {
-  const reduceMotion = useReducedMotion() === true;
   const x = useMotionValue(0);
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
@@ -110,7 +104,7 @@ export function InfiniteMovingCards<
   }, [direction, singleWidth, x]);
 
   useAnimationFrame((_, delta) => {
-    if (reduceMotion || safeItems.length <= 1) return;
+    if (safeItems.length <= 1) return;
     if (pauseOnHover && hovered) return;
     if (singleWidth <= 0) return;
 
@@ -148,7 +142,7 @@ export function InfiniteMovingCards<
           ref={trackRef}
           className="flex w-max py-1"
           style={{
-            x: reduceMotion ? 0 : x,
+            x,
             gap,
           }}
         >

@@ -63,7 +63,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   }
 
   return (
-    <div className="group bg-surface rounded-sm p-2 sm:p-4 md:p-5 hover:bg-surface-raised transition-[background-color,transform] duration-200 hover:scale-[1.02] active:scale-[1.02] will-change-transform">
+    <div className="group h-full flex flex-col bg-surface rounded-sm p-2 sm:p-4 md:p-5 hover:bg-surface-raised transition-[background-color,transform] duration-200 hover:scale-[1.02] active:scale-[1.02] will-change-transform">
       <Link href={`/producto/${producto.slug}`} className="block">
         <div className="relative aspect-square mb-2 sm:mb-4 overflow-hidden">
           <ImagenProducto
@@ -142,7 +142,16 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+      {/* mt-auto: el contenedor raíz de la tarjeta ahora es h-full flex
+          flex-col (para estirarse parejo con sus vecinas de la misma fila
+          de la grilla — comportamiento por defecto de CSS grid). Sin
+          mt-auto acá, dos tarjetas con distinta cantidad de líneas en el
+          título (2 vs 3) o de tamaños (uno vs dos) dejaban el espacio
+          "de más" como aire suelto al final de la tarjeta más corta, y el
+          precio/Agregar quedaba a distinta altura entre columnas — con
+          mt-auto, este bloque se pega siempre al piso de la tarjeta,
+          parejo en toda la fila. */}
+      <div className="mt-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
         <p className="font-[var(--font-body)] font-semibold text-primary text-lg md:text-xl">
           {porcentajeOff != null && (
             <span className="text-on-surface-muted font-normal text-sm line-through mr-2">
