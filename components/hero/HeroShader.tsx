@@ -122,6 +122,7 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
 
     let rafId = 0;
     let running = true;
+    let inView = true;
     const startTime = performance.now();
 
     function resize() {
@@ -145,7 +146,7 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
       if (!running) return;
       const seconds = (performance.now() - startTime) / 1000;
       draw(seconds);
-      if (!document.hidden) {
+      if (!document.hidden && inView) {
         rafId = requestAnimationFrame(frame);
       }
     }
@@ -153,10 +154,29 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
     function handleVisibility() {
       if (document.hidden) {
         cancelAnimationFrame(rafId);
-      } else if (running) {
+      } else if (running && inView) {
         rafId = requestAnimationFrame(frame);
       }
     }
+
+    // El Hero solo ocupa el primer tramo de la página — sin esto, el rAF
+    // del shader seguía dibujando cada frame (WebGL + GPU) durante el
+    // resto de la sesión aunque el usuario ya hubiera scrolleado varias
+    // pantallas de distancia y el canvas ni siquiera fuera visible. Era
+    // el gasto más grande de todo el sitio en desktop.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        if (inView && running && !document.hidden) {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(frame);
+        } else {
+          cancelAnimationFrame(rafId);
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
 
     rafId = requestAnimationFrame(frame);
 
@@ -166,6 +186,7 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
     return () => {
       running = false;
       cancelAnimationFrame(rafId);
+      io.disconnect();
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", handleVisibility);
     };

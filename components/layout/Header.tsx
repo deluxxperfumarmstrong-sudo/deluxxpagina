@@ -18,8 +18,19 @@ export default function Header({ categorias }: { categorias: CategoriaNav[] }) {
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // El evento nativo "scroll" dispara decenas de veces por segundo — sin
+    // el throttle por rAF, cada uno de esos eventos corría una función JS
+    // durante todo el recorrido de la página (el setState no re-renderiza
+    // si el booleano no cambió, pero la función igual se ejecutaba).
+    // requestAnimationFrame lo baja a como mucho una vez por frame pintado.
+    let ticking = false;
     function onScroll() {
-      setScrolleado(window.scrollY > 8);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolleado(window.scrollY > 8);
+        ticking = false;
+      });
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

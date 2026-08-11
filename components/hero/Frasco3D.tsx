@@ -189,13 +189,18 @@ function Frasco({ autoRotar }: { autoRotar: boolean }) {
   );
 }
 
-export default function Frasco3D() {
+export default function Frasco3D({ activo = true }: { activo?: boolean }) {
   return (
     <Canvas
       dpr={[1, 2]}
       camera={{ position: [0, 0, 3.9], fov: 30 }}
       gl={{ alpha: true, antialias: true }}
       style={{ pointerEvents: "auto" }}
+      // "never" corta por completo el render loop de R3F (y con él,
+      // useFrame de <Frasco> que hace girar el frasco) mientras el Hero
+      // no está en viewport — ver Frasco3DOverlay. No afecta la rotación
+      // ni ningún otro movimiento mientras el canvas SÍ está a la vista.
+      frameloop={activo ? "always" : "never"}
     >
       <ambientLight intensity={0.55} />
       <directionalLight position={[2.5, 3, 4]} intensity={1.5} />
