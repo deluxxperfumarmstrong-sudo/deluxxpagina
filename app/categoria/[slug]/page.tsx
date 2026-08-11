@@ -41,13 +41,6 @@ export default async function CategoriaPage({
     sp.genero === "MASCULINO" || sp.genero === "FEMENINO" || sp.genero === "UNISEX"
       ? sp.genero
       : undefined;
-  const relevancia =
-    typeof sp.relevancia === "string" && sp.relevancia
-      ? (sp.relevancia
-          .split(",")
-          .map(Number)
-          .filter((n): n is 1 | 2 | 3 => n === 1 || n === 2 || n === 3) as (1 | 2 | 3)[])
-      : undefined;
   const q = typeof sp.q === "string" ? sp.q : undefined;
   const orden =
     sp.orden === "precio-asc" || sp.orden === "precio-desc" || sp.orden === "relevancia"
@@ -62,7 +55,6 @@ export default async function CategoriaPage({
       tipo,
       ml,
       genero,
-      relevancia,
       q,
       orden,
       pagina,
@@ -96,7 +88,6 @@ export default async function CategoriaPage({
           tipo,
           ml: ml ? String(ml) : undefined,
           genero,
-          relevancia: relevancia && relevancia.length > 0 ? relevancia.join(",") : undefined,
           q,
           orden: orden !== "reciente" ? orden : undefined,
         }}

@@ -11,12 +11,6 @@ const ETIQUETA_GENERO: Record<string, string> = {
   UNISEX: "Unisex",
 };
 
-const NIVELES_RELEVANCIA = [
-  { valor: 3, etiqueta: "Alta" },
-  { valor: 2, etiqueta: "Media" },
-  { valor: 1, etiqueta: "Baja" },
-] as const;
-
 export default function FiltrosCatalogo({
   categorias,
   mostrarCategoria = true,
@@ -74,20 +68,6 @@ export default function FiltrosCatalogo({
   const mlActivo = searchParams.get("ml") ?? "";
   const generoActivo = searchParams.get("genero") ?? "";
   const ordenActivo = searchParams.get("orden") ?? "";
-  const relevanciaActiva = (searchParams.get("relevancia") ?? "")
-    .split(",")
-    .filter(Boolean)
-    .map(Number);
-
-  function toggleRelevancia(nivel: number) {
-    const set = new Set(relevanciaActiva);
-    if (set.has(nivel)) {
-      set.delete(nivel);
-    } else {
-      set.add(nivel);
-    }
-    actualizar("relevancia", Array.from(set).sort().join(","));
-  }
 
   const chips: { clave: string; etiqueta: string }[] = [];
   if (categoriaSlug) {
@@ -105,14 +85,6 @@ export default function FiltrosCatalogo({
   }
   if (generoActivo) {
     chips.push({ clave: "genero", etiqueta: ETIQUETA_GENERO[generoActivo] ?? generoActivo });
-  }
-  if (relevanciaActiva.length > 0) {
-    chips.push({
-      clave: "relevancia",
-      etiqueta: `Relevancia: ${relevanciaActiva
-        .map((n) => NIVELES_RELEVANCIA.find((niv) => niv.valor === n)?.etiqueta ?? n)
-        .join(", ")}`,
-    });
   }
   if (ordenActivo) {
     chips.push({
@@ -260,36 +232,6 @@ export default function FiltrosCatalogo({
             <option value="precio-desc">Precio: mayor a menor</option>
           </select>
           <Chevron />
-        </div>
-
-        {/* Relevancia es multi-selección (podés querer "alta" + "media" a
-            la vez), por eso no es un <select> como el resto — son chips que
-            se togglean, igual que los filtros ya aplicados de más abajo. */}
-        <div className="col-span-2 sm:col-span-1 flex items-center gap-1.5">
-          <span className="text-xs text-on-surface-muted uppercase tracking-wide mr-0.5">
-            Relevancia:
-          </span>
-          {NIVELES_RELEVANCIA.map((nivel) => {
-            const activo = relevanciaActiva.includes(nivel.valor);
-            return (
-              <button
-                key={nivel.valor}
-                type="button"
-                aria-pressed={activo}
-                onClick={() => toggleRelevancia(nivel.valor)}
-                // min-h-[36px], NO min-h-9: el paso 9 está overrideado a
-                // 128px por la escala custom de globals.css (ver el mismo
-                // comentario en ProductosOrdenables.tsx).
-                className={`min-h-[36px] px-2.5 text-xs border rounded-sm transition-colors ${
-                  activo
-                    ? "border-accent bg-accent text-on-accent"
-                    : "border-border text-on-surface-muted hover:border-accent hover:text-accent"
-                }`}
-              >
-                {nivel.etiqueta}
-              </button>
-            );
-          })}
         </div>
       </div>
 
