@@ -149,7 +149,7 @@ export async function crearProductoAction(
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");
   revalidatePath("/");
-  redirect("/admin/productos");
+  redirect("/admin/productos?ok=creado");
 }
 
 export async function actualizarProductoAction(
@@ -181,7 +181,7 @@ export async function actualizarProductoAction(
   revalidatePath(`/producto/${input.slug}`);
   revalidatePath("/catalogo");
   revalidatePath("/");
-  redirect("/admin/productos");
+  redirect("/admin/productos?ok=actualizado");
 }
 
 // A diferencia de crear/editar/eliminar, esta no hace redirect(): se llama
@@ -254,5 +254,5 @@ export async function eliminarProductoAction(id: string) {
   // lugar la ruta actual tras una Server Action sin redirect — en la
   // práctica, sin esto, la mutación en memoria pasa pero la página se
   // queda mostrando el árbol viejo.
-  redirect("/admin/productos");
+  redirect("/admin/productos?ok=eliminado");
 }

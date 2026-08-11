@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import Wordmark from "@/components/layout/Wordmark";
 import AdminNav from "@/components/admin/AdminNav";
+import ToastAdmin from "@/components/admin/ToastAdmin";
 import { usandoDatosMock } from "@/lib/data";
 import { cerrarSesionAdmin } from "./login/actions";
 
@@ -42,6 +44,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-10">{children}</main>
+
+      <Suspense fallback={null}>
+        <ToastAdmin />
+      </Suspense>
     </div>
   );
 }
