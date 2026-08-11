@@ -33,7 +33,7 @@ export default function ItemCarritoFila({ item }: { item: ItemCarrito }) {
         </Link>
         <p className="text-xs text-on-surface-muted mt-1">
           {item.categoriaNombre} · {item.ml}ml ·{" "}
-          {item.tipo === "ENCARGO" ? "Por encargo" : "En stock"}
+          {item.tipo === "ENCARGO" ? "Por pedido" : "En stock"}
         </p>
         {item.tieneSena && (
           <p className="text-xs text-accent-text mt-1">

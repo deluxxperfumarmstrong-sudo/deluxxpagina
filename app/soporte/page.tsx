@@ -16,9 +16,9 @@ const PREGUNTAS: PreguntaFrecuente[] = [
       "Elegís el perfume y el tamaño en el catálogo, lo agregás al carrito y cerrás el pedido por WhatsApp. Ahí coordinamos envío y pago.",
   },
   {
-    pregunta: "¿Qué diferencia hay entre \"por encargo\" y \"en stock\"?",
+    pregunta: "¿Qué diferencia hay entre \"por pedido\" y \"en stock\"?",
     respuesta:
-      "Los productos en stock los tenemos ya disponibles. Los que son por encargo se piden especialmente para vos, y llevan una seña del 50% del total para confirmar el pedido.",
+      "Los productos en stock los tenemos ya disponibles. Los que son por pedido se piden especialmente para vos, y llevan una seña del 50% del total para confirmar el pedido.",
   },
   {
     pregunta: "¿Puedo probar el perfume antes de comprarlo?",

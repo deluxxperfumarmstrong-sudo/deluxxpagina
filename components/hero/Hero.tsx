@@ -48,7 +48,7 @@ export default function Hero() {
             {SLOGAN}
           </p>
           <p className="mt-4 md:mt-7 max-w-lg font-[var(--font-body)] font-semibold text-on-background text-base sm:text-xl md:text-2xl leading-snug drop-shadow-[0_3px_18px_rgba(0,0,0,0.85)]">
-            Perfumería árabe, de nicho y de diseñador. Por encargo o en stock,
+            Perfumería árabe, de nicho y de diseñador. Por pedido o en stock,
             con muestras para probar antes de comprar.
           </p>
           {/* Los dos botones van siempre en una sola fila, uno al lado del

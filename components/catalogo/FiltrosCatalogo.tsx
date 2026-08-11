@@ -77,7 +77,7 @@ export default function FiltrosCatalogo({
   if (tipoActivo) {
     chips.push({
       clave: "tipo",
-      etiqueta: tipoActivo === "ENCARGO" ? "Por encargo" : "En stock",
+      etiqueta: tipoActivo === "ENCARGO" ? "Por pedido" : "En stock",
     });
   }
   if (mlActivo) {
@@ -175,7 +175,7 @@ export default function FiltrosCatalogo({
             <option value="" disabled hidden>
               Tipo
             </option>
-            <option value="ENCARGO">Por encargo</option>
+            <option value="ENCARGO">Por pedido</option>
             <option value="STOCK">En stock</option>
           </select>
           <Chevron />

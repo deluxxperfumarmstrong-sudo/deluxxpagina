@@ -12,8 +12,8 @@ export default function Footer() {
           <Wordmark size="sm" />
           <p className="mt-3 font-display italic text-accent text-base">{SLOGAN}</p>
           <p className="mt-3 text-sm text-on-surface-muted max-w-xs">
-            Perfumería árabe, de nicho, de diseñador y kits. Pedidos por
-            encargo y en stock, cierre por WhatsApp.
+            Perfumería árabe, de nicho, de diseñador y kits. Por pedido y en
+            stock, cierre por WhatsApp.
           </p>
         </div>
 

@@ -24,7 +24,7 @@ const VALORES = [
     icono: IconoEstrella,
     titulo: "Calidad",
     texto:
-      "Trabajamos con stock propio y pedidos por encargo, siempre con el mismo estándar: lo que llega a tus manos es lo que prometimos.",
+      "Trabajamos con stock propio y productos por pedido, siempre con el mismo estándar: lo que llega a tus manos es lo que prometimos.",
   },
   {
     icono: IconoChat,
@@ -49,7 +49,7 @@ export default function QuienesSomosPage() {
             <div className="max-w-2xl flex flex-col gap-5 text-on-surface leading-relaxed text-base md:text-lg">
               <p>
                 Deluxx Perfum nace para acercar perfumería árabe, de nicho y de diseñador a quien
-                busca algo distinto — sin las vueltas de una perfumería tradicional. Encargo o
+                busca algo distinto — sin las vueltas de una perfumería tradicional. Pedido o
                 stock, la decisión es tuya.
               </p>
               <p>

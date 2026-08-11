@@ -73,7 +73,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 30vw"
           />
           {/* Apiladas en la misma esquina, no una en cada punta: en una
-              tarjeta de ~150px (grilla de 2 columnas en mobile) "Encargo" +
+              tarjeta de ~150px (grilla de 2 columnas en mobile) "Pedido" +
               "-20%" repartidas a izquierda y derecha se superponen igual
               aunque cada una sea corta — medido con canvas.measureText, no
               a ojo. Apiladas, cada chip solo compite por el ancho completo
@@ -98,14 +98,24 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       {/* La imagen es chica en mobile (grilla de 2 columnas) — dos chips
           arriba ya la ocupaban a la mitad y "Muestra disponible" se
           truncaba. Se movió acá, debajo del título, donde entra el texto
-          completo y no compite por espacio con el tipo/descuento. */}
-      {producto.tieneMuestra && (
-        <div className="mt-2 mb-1">
-          <BadgeMuestra compacto />
-        </div>
-      )}
+          completo y no compite por espacio con el tipo/descuento.
+          Siempre se renderiza (con "invisible" si no aplica) en vez de
+          condicionar el bloque entero: dos tarjetas vecinas en la misma
+          fila de la grilla, una con muestra y otra sin, quedaban con la
+          fila de precio/Agregar a distinta altura porque a una le faltaba
+          este renglón. "invisible" reserva el mismo espacio sin mostrar
+          nada, así el precio siempre cae en la misma línea. */}
+      <div className="mt-2 mb-1">
+        <BadgeMuestra compacto className={producto.tieneMuestra ? "" : "invisible"} />
+      </div>
 
-      {mililitrosOrdenados.length > 1 && (
+      {/* length > 0, no > 1: antes un producto/kit con un solo tamaño
+          quedaba sin ninguna indicación de tamaño en la tarjeta (la
+          condición pedía más de uno para mostrar el selector). Ahora
+          siempre se ve — con un solo tamaño, el "radiogroup" tiene un solo
+          botón, ya marcado como activo, que no hace nada al clickear (no
+          hay otra opción a la que cambiar), pero deja claro cuál es. */}
+      {mililitrosOrdenados.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3" role="radiogroup" aria-label="Tamaño en mililitros">
           {mililitrosOrdenados.map((opcion) => {
             const activo = opcion === ml;

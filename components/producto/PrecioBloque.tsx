@@ -27,7 +27,7 @@ export default function PrecioBloque({
         <p className="mt-2 text-sm text-on-surface-muted">
           Seña para pedir:{" "}
           <span className="text-accent-text font-semibold">{formatoPrecio(sena)}</span>{" "}
-          (50% del total — producto por encargo)
+          (50% del total — producto por pedido)
         </p>
       )}
     </div>

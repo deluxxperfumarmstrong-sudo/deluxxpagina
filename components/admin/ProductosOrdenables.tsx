@@ -111,7 +111,7 @@ function Fila({
         {producto.categoria.nombre}
       </td>
       <td className="py-2 pr-4 text-on-surface-muted whitespace-nowrap">
-        {producto.tipo === "ENCARGO" ? "Encargo" : "Stock"}
+        {producto.tipo === "ENCARGO" ? "Pedido" : "Stock"}
       </td>
       <td className="py-2 pr-4">
         {limitaPorStock(producto) ? (

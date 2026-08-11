@@ -127,7 +127,7 @@ export default function ProductoForm({
         <Campo label="Tipo">
           <select name="tipo" defaultValue={producto?.tipo ?? "STOCK"} className="campo-admin">
             <option value="STOCK">En stock</option>
-            <option value="ENCARGO">Por encargo</option>
+            <option value="ENCARGO">Por pedido</option>
           </select>
         </Campo>
       </div>

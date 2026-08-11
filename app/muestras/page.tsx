@@ -43,7 +43,7 @@ export default function MuestrasPage() {
             <p className="text-on-surface leading-relaxed text-base md:text-lg mb-4">
               Muchos de nuestros perfumes tienen muestra disponible para que puedas probarlos
               antes de decidir el tamaño y cerrar la compra. Es la forma más segura de encontrar
-              tu fragancia, sobre todo en pedidos por encargo.
+              tu fragancia, sobre todo en compras por pedido.
             </p>
             <p className="text-on-surface leading-relaxed text-base md:text-lg mb-4 md:mb-8">
               Los productos con muestra disponible se identifican con este badge en el catálogo y

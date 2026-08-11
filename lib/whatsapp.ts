@@ -9,7 +9,7 @@ export function generarMensajeWhatsApp(items: ItemCarrito[], ubicacion?: string)
   const lineas = items.map((i) => {
     const subtotalLinea = i.precioUnitario * i.cantidad;
     const senaLinea = i.senaUnitaria * i.cantidad;
-    const senaTag = i.tieneSena ? `  [ENCARGO · seña ${formatoPrecio(senaLinea)}]` : "";
+    const senaTag = i.tieneSena ? `  [PEDIDO · seña ${formatoPrecio(senaLinea)}]` : "";
     return `• ${i.nombre} — ${i.ml}ml × ${i.cantidad} — ${formatoPrecio(subtotalLinea)}${senaTag}`;
   });
 
