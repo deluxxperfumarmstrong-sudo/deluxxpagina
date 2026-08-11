@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, RoundedBox, useTexture } from "@react-three/drei";
+import { OrbitControls, PerformanceMonitor, RoundedBox, useTexture } from "@react-three/drei";
 import { ClampToEdgeWrapping, type Group } from "three";
 
 // Frasco rectangular acanalado (referencia: Lattafa "Kingdom"), pero en los
@@ -190,9 +190,17 @@ function Frasco({ autoRotar }: { autoRotar: boolean }) {
 }
 
 export default function Frasco3D({ activo = true }: { activo?: boolean }) {
+  // Arranca en la resolución interna máxima (dpr real del monitor, tope 2)
+  // y PerformanceMonitor la va bajando de a un escalón (2 → 1.5 → 1) solo
+  // si mide que esta PC puntual no llega a un frame rate fluido — nunca
+  // toca la velocidad de la rotación (esa va por delta time, no por fps),
+  // solo la cantidad de píxeles que hay que dibujar por frame. En una PC
+  // sin problemas nunca baja de dpr 2.
+  const [dpr, setDpr] = useState(2);
+
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={dpr}
       camera={{ position: [0, 0, 3.9], fov: 30 }}
       gl={{ alpha: true, antialias: true }}
       style={{ pointerEvents: "auto" }}
@@ -202,6 +210,10 @@ export default function Frasco3D({ activo = true }: { activo?: boolean }) {
       // ni ningún otro movimiento mientras el canvas SÍ está a la vista.
       frameloop={activo ? "always" : "never"}
     >
+      <PerformanceMonitor
+        onDecline={() => setDpr((d) => Math.max(1, d - 0.5))}
+        flipflops={2}
+      />
       <ambientLight intensity={0.55} />
       <directionalLight position={[2.5, 3, 4]} intensity={1.5} />
       <directionalLight position={[-3, 1, -2]} intensity={0.5} />

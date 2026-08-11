@@ -125,8 +125,21 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
     let inView = true;
     const startTime = performance.now();
 
+    // Escala de resolución interna, aparte del dpr del monitor — arranca en
+    // 1 (o sea, dpr real hasta 2x) y solo baja si esta PC puntual no llega
+    // a un frame rate fluido. El shader es un fragment shader full-screen:
+    // su costo escala directo con la cantidad de píxeles a dibujar, así que
+    // achicar la resolución interna (sin tocar el tamaño en pantalla, ni la
+    // velocidad de la animación, que sigue yendo por tiempo real) es la
+    // palanca más efectiva para las GPUs integradas más limitadas.
+    let escala = 1;
+    let ultimoAjuste = startTime;
+    let framesDesdeAjuste = 0;
+    let sumaFrameMs = 0;
+    const ESCALA_MIN = 0.55;
+
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2) * escala;
       const width = Math.floor(canvas!.clientWidth * dpr);
       const height = Math.floor(canvas!.clientHeight * dpr);
       if (canvas!.width !== width || canvas!.height !== height) {
@@ -142,10 +155,29 @@ export default function HeroShader({ children }: { children?: React.ReactNode })
       gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     }
 
-    function frame() {
+    function frame(now: number) {
       if (!running) return;
-      const seconds = (performance.now() - startTime) / 1000;
+      const seconds = (now - startTime) / 1000;
       draw(seconds);
+
+      // Ventana de ~45 frames (~0.75s a 60fps) antes de mirar el promedio:
+      // deja pasar el arranque en frío (compilación/primer layout) sin
+      // gatillar un ajuste que no corresponde a rendimiento sostenido.
+      framesDesdeAjuste++;
+      if (framesDesdeAjuste > 1) sumaFrameMs += now - ultimoAjuste;
+      if (framesDesdeAjuste >= 45 && escala > ESCALA_MIN) {
+        const promedioMs = sumaFrameMs / (framesDesdeAjuste - 1);
+        if (promedioMs > 27) {
+          // ~<37fps sostenido → un escalón más chico, se vuelve a medir
+          // desde cero con la nueva resolución (no vuelve a subir: mejor
+          // quedarse estable que oscilar).
+          escala = Math.max(ESCALA_MIN, escala - 0.15);
+        }
+        framesDesdeAjuste = 0;
+        sumaFrameMs = 0;
+      }
+      ultimoAjuste = now;
+
       if (!document.hidden && inView) {
         rafId = requestAnimationFrame(frame);
       }
