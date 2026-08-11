@@ -13,7 +13,7 @@ export default async function AdminCategoriasPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 mb-2">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
         <h1 className="font-display text-3xl text-on-background">Categorías</h1>
         <Link
           href="/admin/categorias/nueva"

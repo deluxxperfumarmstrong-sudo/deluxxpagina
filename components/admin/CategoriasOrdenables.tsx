@@ -44,7 +44,7 @@ function Fila({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-center gap-4 py-4 border-b border-border-subtle ${
+      className={`flex flex-wrap sm:flex-nowrap items-center gap-x-4 gap-y-3 py-4 border-b border-border-subtle ${
         isDragging ? "relative z-10 bg-surface-raised" : ""
       }`}
     >
@@ -60,7 +60,13 @@ function Fila({
         <IconoArrastre className="w-5 h-5" />
       </button>
 
-      <div className="flex-1 min-w-0">
+      {/* En mobile la fila entera (handle + nombre + badge + botones) no
+          entraba en una sola línea — el badge "Activa" y "Desactivar"
+          terminaban superpuestos sobre el nombre. flex-wrap en el
+          contenedor + basis-full acá fuerza al nombre a ocupar su propia
+          línea completa, y las acciones bajan a una segunda fila. Desde
+          sm en adelante vuelve a ser todo una sola línea (flex-nowrap). */}
+      <div className="flex-1 min-w-0 basis-full sm:basis-auto">
         <p className="font-display text-lg text-on-background truncate">{categoria.nombre}</p>
         <p className="text-xs text-on-surface-muted">
           {categoria.slug} · {cantidad} producto{cantidad === 1 ? "" : "s"} activo
@@ -68,7 +74,7 @@ function Fila({
         </p>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center flex-wrap gap-3 w-full sm:w-auto sm:shrink-0">
         <span
           className={`text-xs uppercase tracking-wide px-3 py-1 rounded-full bg-surface-raised ${
             categoria.activa ? "text-success" : "text-on-surface-muted"
