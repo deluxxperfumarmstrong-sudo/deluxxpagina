@@ -41,16 +41,23 @@ const PALABRAS_DISENADOR = [
   "Aristocrate", "Noblesse", "Renaissance",
 ];
 
-const NOTAS_BASE = [
-  "Bergamota, cardamomo, oud, ámbar, almizcle",
-  "Azafrán, rosa, cuero, sándalo, vainilla",
-  "Pomelo, pimienta rosa, vetiver, cedro",
-  "Incienso, oud, resina, pachulí",
-  "Manzana, canela, tabaco, haba tonka",
-  "Bergamota, lavanda, iris, almizcle blanco",
-  "Naranja sanguina, jengibre, cuero, ámbar",
-  "Sal marina, cedro atlas, musgo de roble",
+// Antes era un string suelto por producto ("Bergamota, cardamomo, oud,
+// ámbar, almizcle") — ahora el producto pide las notas separadas por etapa
+// (ver Producto.notasSalida/Corazon/Fondo en schema.prisma), así que el
+// banco de notas mock también queda estructurado en tres tiempos en vez de
+// una lista plana.
+const NOTAS_BASE: { salida: string[]; corazon: string[]; fondo: string[] }[] = [
+  { salida: ["Bergamota", "Cardamomo"], corazon: ["Oud", "Rosa"], fondo: ["Ámbar", "Almizcle"] },
+  { salida: ["Azafrán"], corazon: ["Rosa", "Cuero"], fondo: ["Sándalo", "Vainilla"] },
+  { salida: ["Pomelo", "Pimienta rosa"], corazon: ["Vetiver"], fondo: ["Cedro"] },
+  { salida: ["Incienso"], corazon: ["Oud", "Resina"], fondo: ["Pachulí"] },
+  { salida: ["Manzana", "Canela"], corazon: ["Tabaco"], fondo: ["Haba tonka"] },
+  { salida: ["Bergamota", "Lavanda"], corazon: ["Iris"], fondo: ["Almizcle blanco"] },
+  { salida: ["Naranja sanguina", "Jengibre"], corazon: ["Cuero"], fondo: ["Ámbar"] },
+  { salida: ["Sal marina"], corazon: ["Cedro atlas"], fondo: ["Musgo de roble"] },
 ];
+
+const GENEROS = ["MASCULINO", "FEMENINO", "UNISEX"] as const;
 
 type CategoriaSeedSlug = (typeof CATEGORIAS_SEED)[number]["slug"];
 
@@ -125,12 +132,23 @@ function generarProductosCategoria(
       }
     }
 
+    const notas = NOTAS_BASE[i % NOTAS_BASE.length];
+    // i % 7 === 0 ya se usa para "destacado" (evenly-spaced, más abajo se
+    // capa a MAX_DESTACADOS) — la relevancia usa otro módulo para no quedar
+    // pegada 1:1 con destacados. Se sesga hacia 2 (media), como en un
+    // catálogo real donde no todo es "alta" ni "baja".
+    const relevancia: 1 | 2 | 3 = i % 5 === 0 ? 3 : i % 3 === 0 ? 1 : 2;
+
     productos.push({
       id: `mock-${slug}`,
       nombre,
       slug,
       descripcion: `${nombre} — fragancia de la colección ${nombreCategoria(categoriaSlug)}.`,
-      notas: NOTAS_BASE[i % NOTAS_BASE.length],
+      notasSalida: notas.salida,
+      notasCorazon: notas.corazon,
+      notasFondo: notas.fondo,
+      genero: GENEROS[i % GENEROS.length],
+      relevancia,
       tipo,
       precios,
       preciosDescuento,

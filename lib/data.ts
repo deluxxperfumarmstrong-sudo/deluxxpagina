@@ -39,6 +39,14 @@ export async function getCategoriaBySlug(slug: string): Promise<Categoria | null
   return prisma.categoria.findUnique({ where: { slug } });
 }
 
+export async function getCategoriaPorId(id: string): Promise<Categoria | null> {
+  if (USE_MOCK) {
+    const { categorias } = leerCatalogo();
+    return categorias.find((c) => c.id === id) ?? null;
+  }
+  return prisma.categoria.findUnique({ where: { id } });
+}
+
 export async function getProductos(filtros: CatalogoFiltros = {}): Promise<{
   productos: Producto[];
   total: number;
@@ -59,11 +67,23 @@ export async function getProductos(filtros: CatalogoFiltros = {}): Promise<{
     if (filtros.ml != null) {
       lista = lista.filter((p) => p.mililitros.includes(filtros.ml!));
     }
+    if (filtros.genero) {
+      lista = lista.filter((p) => p.genero === filtros.genero);
+    }
+    if (filtros.relevancia && filtros.relevancia.length > 0) {
+      lista = lista.filter((p) => filtros.relevancia!.includes(p.relevancia));
+    }
+    if (filtros.q && filtros.q.trim()) {
+      const termino = filtros.q.trim().toLowerCase();
+      lista = lista.filter((p) => p.nombre.toLowerCase().includes(termino));
+    }
 
     if (filtros.orden === "precio-asc") {
       lista = [...lista].sort((a, b) => precioDesde(a) - precioDesde(b));
     } else if (filtros.orden === "precio-desc") {
       lista = [...lista].sort((a, b) => precioDesde(b) - precioDesde(a));
+    } else if (filtros.orden === "relevancia") {
+      lista = [...lista].sort((a, b) => b.relevancia - a.relevancia);
     } else {
       lista = [...lista].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
@@ -79,11 +99,19 @@ export async function getProductos(filtros: CatalogoFiltros = {}): Promise<{
     ...(filtros.categoriaSlug ? { categoria: { slug: filtros.categoriaSlug } } : {}),
     ...(filtros.tipo ? { tipo: filtros.tipo } : {}),
     ...(filtros.ml != null ? { mililitros: { has: filtros.ml } } : {}),
+    ...(filtros.genero ? { genero: filtros.genero } : {}),
+    ...(filtros.relevancia && filtros.relevancia.length > 0
+      ? { relevancia: { in: filtros.relevancia } }
+      : {}),
+    ...(filtros.q && filtros.q.trim()
+      ? { nombre: { contains: filtros.q.trim(), mode: "insensitive" as const } }
+      : {}),
   };
 
   // `precios` es Json, no se puede ordenar en SQL directo. Para "reciente"
-  // (el caso más común) se pagina en la base; para orden por precio se trae
-  // todo lo que matchea el filtro y se ordena/pagina en memoria.
+  // (el caso más común) y "relevancia" (columna real, sí se puede ordenar en
+  // SQL) se pagina en la base; para orden por precio se trae todo lo que
+  // matchea el filtro y se ordena/pagina en memoria.
   if (filtros.orden === "precio-asc" || filtros.orden === "precio-desc") {
     const todos = await prisma.producto.findMany({ where, include: { categoria: true } });
     const lista = (todos as unknown as Producto[]).slice();
@@ -94,11 +122,13 @@ export async function getProductos(filtros: CatalogoFiltros = {}): Promise<{
     return { productos: lista.slice(inicio, inicio + porPagina), total: lista.length };
   }
 
+  const orderBy = filtros.orden === "relevancia" ? { relevancia: "desc" as const } : { createdAt: "desc" as const };
+
   const [productos, total] = await Promise.all([
     prisma.producto.findMany({
       where,
       include: { categoria: true },
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (pagina - 1) * porPagina,
       take: porPagina,
     }),
@@ -190,7 +220,11 @@ export type ProductoInput = {
   nombre: string;
   slug: string;
   descripcion: string | null;
-  notas: string | null;
+  notasSalida: string[];
+  notasCorazon: string[];
+  notasFondo: string[];
+  genero: Producto["genero"];
+  relevancia: Producto["relevancia"];
   tipo: Producto["tipo"];
   precios: Record<string, number>;
   preciosDescuento: Record<string, number>;
@@ -314,6 +348,78 @@ export async function crearCategoria(input: CategoriaInput): Promise<Categoria> 
   const agregado = await prisma.categoria.aggregate({ _max: { orden: true } });
   return prisma.categoria.create({
     data: { ...input, orden: (agregado._max.orden ?? -1) + 1 },
+  });
+}
+
+export async function actualizarCategoria(id: string, input: CategoriaInput): Promise<Categoria> {
+  if (USE_MOCK) {
+    const { categorias, productos } = leerCatalogo();
+    const idx = categorias.findIndex((c) => c.id === id);
+    if (idx === -1) throw new Error("Categoría no encontrada");
+    const actualizada: Categoria = { ...categorias[idx], ...input };
+    categorias[idx] = actualizada;
+    // Los productos ya cargados guardan su propia copia de `categoria`
+    // (denormalizada, ver ProductoInput/crearProducto) — sin esto, la lista
+    // de tamaños vieja seguía apareciendo en `/admin/productos` hasta que
+    // cada producto se reguardara.
+    for (const p of productos) {
+      if (p.categoriaId === id) p.categoria = actualizada;
+    }
+    guardarCatalogo(categorias, productos);
+    return actualizada;
+  }
+  return prisma.categoria.update({ where: { id }, data: input });
+}
+
+// No se permite borrar una categoría con productos (activos o no) — Postgres
+// igual lo rechazaría por la FK `Producto.categoriaId`, pero acá se valida
+// antes para poder devolver un mensaje claro en vez de un error de base
+// crudo, y para no dejar productos con una referencia que apunta a nada.
+export async function eliminarCategoria(id: string): Promise<void> {
+  if (USE_MOCK) {
+    const { categorias, productos } = leerCatalogo();
+    if (productos.some((p) => p.categoriaId === id)) {
+      throw new Error(
+        "No se puede eliminar: hay productos en esta categoría. Reasignalos o eliminalos primero."
+      );
+    }
+    const idx = categorias.findIndex((c) => c.id === id);
+    if (idx !== -1) categorias.splice(idx, 1);
+    guardarCatalogo(categorias, productos);
+    return;
+  }
+  const cantidad = await prisma.producto.count({ where: { categoriaId: id } });
+  if (cantidad > 0) {
+    throw new Error(
+      "No se puede eliminar: hay productos en esta categoría. Reasignalos o eliminalos primero."
+    );
+  }
+  await prisma.categoria.delete({ where: { id } });
+}
+
+// Usado desde ProductoForm cuando se carga un tamaño que la categoría
+// todavía no tiene — el tamaño queda disponible para el resto de los
+// productos de esa categoría a partir de ahí, sin duplicarse si ya estaba.
+export async function agregarMililitroACategoria(categoriaId: string, ml: number): Promise<void> {
+  if (USE_MOCK) {
+    const { categorias, productos } = leerCatalogo();
+    const cat = categorias.find((c) => c.id === categoriaId);
+    if (!cat) throw new Error("Categoría no encontrada");
+    if (!cat.mililitrosDisponibles.includes(ml)) {
+      cat.mililitrosDisponibles = [...cat.mililitrosDisponibles, ml].sort((a, b) => a - b);
+      for (const p of productos) {
+        if (p.categoriaId === categoriaId) p.categoria = cat;
+      }
+    }
+    guardarCatalogo(categorias, productos);
+    return;
+  }
+  const cat = await prisma.categoria.findUnique({ where: { id: categoriaId } });
+  if (!cat) throw new Error("Categoría no encontrada");
+  if (cat.mililitrosDisponibles.includes(ml)) return;
+  await prisma.categoria.update({
+    where: { id: categoriaId },
+    data: { mililitrosDisponibles: [...cat.mililitrosDisponibles, ml].sort((a, b) => a - b) },
   });
 }
 

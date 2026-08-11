@@ -63,6 +63,13 @@ export function leerCatalogo(): { categorias: Categoria[]; productos: Producto[]
     const categoriaPorId = new Map(categorias.map((c) => [c.id, c]));
     const productos: Producto[] = data.productos.map((p) => ({
       ...p,
+      // Mismo compat que arriba, para productos guardados antes de que
+      // existieran las notas por etapa/género/relevancia.
+      notasSalida: p.notasSalida ?? [],
+      notasCorazon: p.notasCorazon ?? [],
+      notasFondo: p.notasFondo ?? [],
+      genero: p.genero ?? "UNISEX",
+      relevancia: p.relevancia ?? 2,
       createdAt: new Date(p.createdAt),
       categoria: categoriaPorId.get(p.categoriaId)!,
     }));

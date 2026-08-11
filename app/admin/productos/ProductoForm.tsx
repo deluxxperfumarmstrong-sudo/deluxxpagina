@@ -37,15 +37,38 @@ export default function ProductoForm({
   // sembrada antes de que este campo existiera (queda con []), se cae a la
   // lista completa en vez de no mostrar ningún tamaño para elegir.
   const categoriaElegida = categorias.find((c) => c.id === categoriaId);
-  const mlDisponibles: number[] =
+  const mlDeCategoria: number[] =
     categoriaElegida && categoriaElegida.mililitrosDisponibles.length > 0
       ? categoriaElegida.mililitrosDisponibles
       : [...MILILITROS_VALIDOS];
+  // Tamaños sumados a mano en este formulario, todavía no guardados en la
+  // categoría — al guardar el producto, la Server Action los agrega también
+  // a la categoría (ver actions.ts), quedando disponibles para el resto de
+  // sus productos. Arrancan en los que ya tenía el producto pero la
+  // categoría no (puede pasar si se le sacó ese tamaño a la categoría
+  // después de cargar este producto).
+  const [tamanosExtra, setTamanosExtra] = useState<number[]>(
+    (producto?.mililitros ?? []).filter((ml) => !mlDeCategoria.includes(ml))
+  );
+  const [tamanoNuevo, setTamanoNuevo] = useState("");
+  const mlDisponibles = [...new Set([...mlDeCategoria, ...tamanosExtra])].sort((a, b) => a - b);
 
   function toggleMl(ml: number) {
     setMlSeleccionados((prev) =>
       prev.includes(ml) ? prev.filter((x) => x !== ml) : [...prev, ml].sort((a, b) => a - b)
     );
+  }
+
+  function agregarTamanoNuevo() {
+    const ml = Math.floor(Number(tamanoNuevo));
+    if (!Number.isFinite(ml) || ml <= 0) return;
+    if (!mlDeCategoria.includes(ml) && !tamanosExtra.includes(ml)) {
+      setTamanosExtra((prev) => [...prev, ml]);
+    }
+    if (!mlSeleccionados.includes(ml)) {
+      setMlSeleccionados((prev) => [...prev, ml].sort((a, b) => a - b));
+    }
+    setTamanoNuevo("");
   }
 
   function handleCategoriaChange(nuevaCategoriaId: string) {
@@ -55,6 +78,7 @@ export default function ProductoForm({
       categoria && categoria.mililitrosDisponibles.length > 0
         ? categoria.mililitrosDisponibles
         : [...MILILITROS_VALIDOS];
+    setTamanosExtra([]);
     // Si el tamaño ya no está permitido en la categoría nueva, se
     // deselecciona — de lo contrario quedaría un checkbox tildado pero
     // oculto (la fila ni se muestra), enviando un ml inválido al guardar.
@@ -108,9 +132,56 @@ export default function ProductoForm({
         </Campo>
       </div>
 
-      <Campo label="Notas olfativas (opcional)">
-        <input name="notas" defaultValue={producto?.notas ?? ""} className="campo-admin" />
-      </Campo>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Campo label="Género">
+          <select name="genero" defaultValue={producto?.genero ?? "UNISEX"} className="campo-admin">
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMENINO">Femenino</option>
+            <option value="UNISEX">Unisex</option>
+          </select>
+        </Campo>
+        <Campo label="Relevancia">
+          <select
+            name="relevancia"
+            defaultValue={String(producto?.relevancia ?? 2)}
+            className="campo-admin"
+          >
+            <option value="1">1 — Baja</option>
+            <option value="2">2 — Media</option>
+            <option value="3">3 — Alta (aparece primero)</option>
+          </select>
+        </Campo>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Campo label="Notas de salida (opcional)">
+          <textarea
+            name="notasSalida"
+            defaultValue={producto?.notasSalida.join("\n") ?? ""}
+            rows={3}
+            placeholder={"Una por línea, ej:\nBergamota\nPomelo"}
+            className="campo-admin"
+          />
+        </Campo>
+        <Campo label="Notas de corazón (opcional)">
+          <textarea
+            name="notasCorazon"
+            defaultValue={producto?.notasCorazon.join("\n") ?? ""}
+            rows={3}
+            placeholder={"Una por línea, ej:\nRosa\nOud"}
+            className="campo-admin"
+          />
+        </Campo>
+        <Campo label="Notas de fondo (opcional)">
+          <textarea
+            name="notasFondo"
+            defaultValue={producto?.notasFondo.join("\n") ?? ""}
+            rows={3}
+            placeholder={"Una por línea, ej:\nÁmbar\nAlmizcle"}
+            className="campo-admin"
+          />
+        </Campo>
+      </div>
 
       <Campo label="Descripción (opcional)">
         <textarea
@@ -129,6 +200,32 @@ export default function ProductoForm({
           <p className="text-xs text-on-surface-muted mb-2">
             Elegí una categoría arriba para ver sus tamaños disponibles.
           </p>
+        )}
+        {categoriaElegida && (
+          <div className="flex gap-2 mb-3">
+            <input
+              type="number"
+              min={1}
+              value={tamanoNuevo}
+              onChange={(e) => setTamanoNuevo(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  agregarTamanoNuevo();
+                }
+              }}
+              placeholder="Tamaño nuevo (ml)"
+              className="campo-admin w-40"
+              aria-label="Agregar tamaño nuevo en ml"
+            />
+            <button
+              type="button"
+              onClick={agregarTamanoNuevo}
+              className="border border-border text-on-surface text-sm font-semibold px-4 hover:border-accent hover:text-accent transition-colors"
+            >
+              + Agregar a la categoría
+            </button>
+          </div>
         )}
         {/* Encabezado de columnas — el checkbox de tamaño no lleva rótulo
             (ya se lee en la fila: "50 ml"), pero el resto sí, porque son

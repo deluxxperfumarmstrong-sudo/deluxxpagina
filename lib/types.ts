@@ -1,4 +1,7 @@
 export type TipoProducto = "ENCARGO" | "STOCK";
+export type Genero = "MASCULINO" | "FEMENINO" | "UNISEX";
+// 1 = baja, 2 = media, 3 = alta (la más relevante primero al ordenar).
+export type Relevancia = 1 | 2 | 3;
 
 export type Categoria = {
   id: string;
@@ -19,7 +22,11 @@ export type Producto = {
   nombre: string;
   slug: string;
   descripcion: string | null;
-  notas: string | null;
+  notasSalida: string[];
+  notasCorazon: string[];
+  notasFondo: string[];
+  genero: Genero;
+  relevancia: Relevancia;
   tipo: TipoProducto;
   precios: Record<string, number>;
   preciosDescuento: Record<string, number>;
@@ -48,7 +55,10 @@ export type CatalogoFiltros = {
   categoriaSlug?: string;
   tipo?: TipoProducto;
   ml?: number;
-  orden?: "precio-asc" | "precio-desc" | "reciente";
+  genero?: Genero;
+  relevancia?: Relevancia[];
+  q?: string;
+  orden?: "precio-asc" | "precio-desc" | "reciente" | "relevancia";
   pagina?: number;
   porPagina?: number;
 };

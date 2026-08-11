@@ -22,13 +22,29 @@ export default async function CatalogoPage({
   const categoriaSlug = typeof sp.categoria === "string" ? sp.categoria : undefined;
   const tipo = sp.tipo === "ENCARGO" || sp.tipo === "STOCK" ? sp.tipo : undefined;
   const ml = typeof sp.ml === "string" && sp.ml ? Number(sp.ml) : undefined;
+  const genero =
+    sp.genero === "MASCULINO" || sp.genero === "FEMENINO" || sp.genero === "UNISEX"
+      ? sp.genero
+      : undefined;
+  // "1,3" en la URL → [1, 3]. Se guarda así (un solo param) para que
+  // Paginacion no necesite saber que este filtro es multi-valor.
+  const relevancia =
+    typeof sp.relevancia === "string" && sp.relevancia
+      ? (sp.relevancia
+          .split(",")
+          .map(Number)
+          .filter((n): n is 1 | 2 | 3 => n === 1 || n === 2 || n === 3) as (1 | 2 | 3)[])
+      : undefined;
+  const q = typeof sp.q === "string" ? sp.q : undefined;
   const orden =
-    sp.orden === "precio-asc" || sp.orden === "precio-desc" ? sp.orden : "reciente";
+    sp.orden === "precio-asc" || sp.orden === "precio-desc" || sp.orden === "relevancia"
+      ? sp.orden
+      : "reciente";
   const pagina = typeof sp.pagina === "string" ? Math.max(1, Number(sp.pagina) || 1) : 1;
 
   const [categorias, { productos, total }] = await Promise.all([
     getCategoriasActivas(),
-    getProductos({ categoriaSlug, tipo, ml, orden, pagina, porPagina: POR_PAGINA }),
+    getProductos({ categoriaSlug, tipo, ml, genero, relevancia, q, orden, pagina, porPagina: POR_PAGINA }),
   ]);
 
   const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA));
@@ -63,6 +79,9 @@ export default async function CatalogoPage({
               categoria: categoriaSlug,
               tipo,
               ml: ml ? String(ml) : undefined,
+              genero,
+              relevancia: relevancia && relevancia.length > 0 ? relevancia.join(",") : undefined,
+              q,
               orden: orden !== "reciente" ? orden : undefined,
             }}
           />

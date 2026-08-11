@@ -13,6 +13,12 @@ enum TipoProducto {
   STOCK
 }
 
+enum Genero {
+  MASCULINO
+  FEMENINO
+  UNISEX
+}
+
 model Categoria {
   id          String     @id @default(cuid())
   nombre      String     @unique
@@ -22,9 +28,11 @@ model Categoria {
   // no una URL completa pese al nombre del campo — se usa como imagen de la
   // tarjeta de acceso directo en la home (ver ImagenCategoria.tsx).
   imagenUrl   String?
-  // Subconjunto de MILILITROS_VALIDOS (lib/config.ts) que se puede elegir al
-  // cargar un producto de esta categoría — cada categoría nueva lo pide sí o
-  // sí (ver CategoriaForm.tsx).
+  // Tamaños en ml que se pueden elegir al cargar un producto de esta
+  // categoría — de carga libre desde el admin (CategoriaForm.tsx), no una
+  // lista fija: cada categoría define los suyos, y un producto puede sumar
+  // un tamaño nuevo que no estaba (ver ProductoForm.tsx), quedando
+  // disponible después para el resto de los productos de la categoría.
   mililitrosDisponibles Int[] @default([])
   orden       Int        @default(0)
   activa      Boolean    @default(true)
@@ -37,7 +45,16 @@ model Producto {
   nombre       String
   slug         String       @unique
   descripcion  String?
-  notas        String?
+  // Notas olfativas por etapa — reemplaza el campo `notas` (string suelto)
+  // que tenía el producto antes. Cada una es una lista de ingredientes,
+  // editable desde el admin (agregar/editar/quitar).
+  notasSalida  String[]     @default([])
+  notasCorazon String[]     @default([])
+  notasFondo   String[]     @default([])
+  genero       Genero       @default(UNISEX)
+  // 1 = relevancia baja, 2 = media, 3 = alta (la más relevante). Se usa para
+  // ordenar/filtrar el catálogo — ver lib/data.ts.
+  relevancia   Int          @default(2)
   tipo         TipoProducto @default(STOCK)
   precios      Json
   // Precio con descuento por tamaño — mismas claves que `precios` (ml en
@@ -62,4 +79,6 @@ model Producto {
   @@index([categoriaId])
   @@index([tipo])
   @@index([orden])
+  @@index([relevancia])
+  @@index([genero])
 }

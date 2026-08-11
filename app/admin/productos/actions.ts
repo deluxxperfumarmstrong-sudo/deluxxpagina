@@ -11,12 +11,23 @@ import {
   toggleProductoDestacado,
   contarProductosDestacados,
   getProductoPorId,
+  agregarMililitroACategoria,
   type ProductoInput,
 } from "@/lib/data";
 import { validarCoherenciaPreciosMl, validarCoherenciaStockMl } from "@/lib/validacion";
 import { MAX_DESTACADOS } from "@/lib/config";
 import { slugify } from "@/lib/slug";
-import type { TipoProducto } from "@/lib/types";
+import type { TipoProducto, Genero, Relevancia } from "@/lib/types";
+
+// Textarea con una nota por línea — más simple de escribir/leer que un
+// input de tags con Enter, y suficiente para lo que pide el admin (agregar,
+// editar, borrar notas por etapa).
+function leerNotas(formData: FormData, campo: string): string[] {
+  return String(formData.get(campo) ?? "")
+    .split("\n")
+    .map((linea) => linea.trim())
+    .filter(Boolean);
+}
 
 export type EstadoProducto = { error: string | null };
 
@@ -53,7 +64,14 @@ function leerFormulario(formData: FormData): ProductoInput {
   const slugTipeado = slugify(String(formData.get("slug") ?? ""));
   const slug = slugTipeado || slugify(nombre);
   const descripcion = String(formData.get("descripcion") ?? "").trim();
-  const notas = String(formData.get("notas") ?? "").trim();
+  const notasSalida = leerNotas(formData, "notasSalida");
+  const notasCorazon = leerNotas(formData, "notasCorazon");
+  const notasFondo = leerNotas(formData, "notasFondo");
+  const generoValor = String(formData.get("genero") ?? "UNISEX");
+  const genero: Genero =
+    generoValor === "MASCULINO" || generoValor === "FEMENINO" ? generoValor : "UNISEX";
+  const relevanciaNum = Number(formData.get("relevancia"));
+  const relevancia: Relevancia = relevanciaNum === 1 || relevanciaNum === 3 ? relevanciaNum : 2;
   // Los public_id de Cloudinary llegan como inputs ocultos repetidos
   // "imagenes", en el orden en que quedaron tras arrastrarlos en
   // ImagenesOrdenables — ese orden ES el orden final, no hace falta
@@ -67,7 +85,11 @@ function leerFormulario(formData: FormData): ProductoInput {
     nombre,
     slug,
     descripcion: descripcion || null,
-    notas: notas || null,
+    notasSalida,
+    notasCorazon,
+    notasFondo,
+    genero,
+    relevancia,
     tipo: (formData.get("tipo") as TipoProducto) ?? "STOCK",
     precios,
     preciosDescuento,
@@ -114,6 +136,12 @@ export async function crearProductoAction(
 
   try {
     await crearProducto(input);
+    // Un tamaño elegido que la categoría todavía no tenía (agregado a mano
+    // desde este mismo formulario, ver ProductoForm.tsx) queda disponible
+    // para el resto de los productos de la categoría a partir de acá.
+    for (const ml of input.mililitros) {
+      await agregarMililitroACategoria(input.categoriaId, ml);
+    }
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo crear el producto." };
   }
@@ -142,6 +170,9 @@ export async function actualizarProductoAction(
 
   try {
     await actualizarProducto(id, input);
+    for (const ml of input.mililitros) {
+      await agregarMililitroACategoria(input.categoriaId, ml);
+    }
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo actualizar el producto." };
   }

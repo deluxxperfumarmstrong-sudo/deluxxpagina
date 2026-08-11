@@ -103,7 +103,14 @@ function renderTestimonio(r: InfiniteMovingCardItem) {
     <div
       role="img"
       aria-label={`Reseña de ${r.name}`}
-      className="h-56 md:h-64 rounded-sm bg-surface-raised"
+      // h-40 en mobile (no h-56): a 590/381 de aspect-ratio, h-56 (224px) da
+      // una tarjeta de ~347px de ancho — más ancha que la pantalla en la
+      // mayoría de los celulares (320–390px), lo que hacía sentir el
+      // carrusel "trabado" (una sola tarjeta gigante cruzando de punta a
+      // punta en vez de fluir). h-40 (160px) da ~248px de ancho, entra con
+      // margen y se ve una tira de la siguiente tarjeta como en cualquier
+      // carrusel.
+      className="h-40 md:h-64 rounded-sm bg-surface-raised"
       style={{
         aspectRatio: ASPECT_RATIO,
         backgroundImage: `url(${urlTestimonio(r.image)})`,

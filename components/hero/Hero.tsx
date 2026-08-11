@@ -51,16 +51,22 @@ export default function Hero() {
             Perfumería árabe, de nicho y de diseñador. Por encargo o en stock,
             con muestras para probar antes de comprar.
           </p>
-          <div className="mt-6 md:mt-8 flex flex-wrap gap-3 md:gap-4">
+          {/* Los dos botones van siempre en una sola fila, uno al lado del
+              otro — con flex-wrap + el padding de desktop (32px) no entraban
+              juntos en mobile y "Pedir muestra" caía a una segunda línea.
+              flex-1 en mobile (cada uno mitad del ancho) + padding más chico
+              hace que entren de punta a punta; md: vuelve al ancho de
+              contenido + padding grande de siempre. */}
+          <div className="mt-6 md:mt-8 flex gap-3 md:gap-4">
             <Link
               href="/catalogo"
-              className="whitespace-nowrap bg-primary text-on-primary font-[var(--font-body)] font-semibold text-sm uppercase tracking-wide px-[32px] py-[16px] hover:bg-[#E8E8E8] transition-colors"
+              className="flex-1 md:flex-initial text-center whitespace-nowrap bg-primary text-on-primary font-[var(--font-body)] font-semibold text-xs sm:text-sm uppercase tracking-wide px-4 sm:px-6 md:px-[32px] py-[14px] md:py-[16px] hover:bg-[#E8E8E8] transition-colors"
             >
               Ver catálogo
             </Link>
             <Link
               href="/muestras"
-              className="whitespace-nowrap border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-sm uppercase tracking-[0.08em] px-[32px] py-[16px] hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
+              className="flex-1 md:flex-initial text-center whitespace-nowrap border border-accent-text text-accent-text font-[var(--font-body)] font-bold text-xs sm:text-sm uppercase tracking-[0.08em] px-4 sm:px-6 md:px-[32px] py-[14px] md:py-[16px] hover:bg-accent hover:text-on-accent hover:border-accent transition-colors"
             >
               Pedir muestra
             </Link>

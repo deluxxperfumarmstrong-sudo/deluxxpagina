@@ -2,15 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { toggleCategoriaActiva, reordenarCategorias, crearCategoria } from "@/lib/data";
+import {
+  toggleCategoriaActiva,
+  reordenarCategorias,
+  crearCategoria,
+  actualizarCategoria,
+  eliminarCategoria,
+  type CategoriaInput,
+} from "@/lib/data";
 import { slugify } from "@/lib/slug";
 
 export type EstadoCategoria = { error: string | null };
 
-export async function crearCategoriaAction(
-  _prevState: EstadoCategoria,
-  formData: FormData
-): Promise<EstadoCategoria> {
+function leerCategoriaFormulario(formData: FormData): CategoriaInput {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const slugTipeado = slugify(String(formData.get("slug") ?? ""));
   const slug = slugTipeado || slugify(nombre);
@@ -20,18 +24,31 @@ export async function crearCategoriaAction(
     .map((v) => Number(v))
     .filter((n) => !Number.isNaN(n))
     .sort((a, b) => a - b);
+  return { nombre, slug, imagenUrl, mililitrosDisponibles };
+}
 
-  if (!nombre) return { error: "El nombre es obligatorio." };
-  if (!slug) return { error: "No se pudo generar un slug a partir del nombre — probá con otro." };
-  if (!imagenUrl) {
-    return { error: "La imagen es obligatoria — se usa como acceso directo en la home." };
+function validarCategoria(input: CategoriaInput): string | null {
+  if (!input.nombre) return "El nombre es obligatorio.";
+  if (!input.slug) return "No se pudo generar un slug a partir del nombre — probá con otro.";
+  if (!input.imagenUrl) {
+    return "La imagen es obligatoria — se usa como acceso directo en la home.";
   }
-  if (mililitrosDisponibles.length === 0) {
-    return { error: "Elegí al menos un tamaño disponible para esta categoría." };
+  if (input.mililitrosDisponibles.length === 0) {
+    return "Elegí al menos un tamaño disponible para esta categoría.";
   }
+  return null;
+}
+
+export async function crearCategoriaAction(
+  _prevState: EstadoCategoria,
+  formData: FormData
+): Promise<EstadoCategoria> {
+  const input = leerCategoriaFormulario(formData);
+  const error = validarCategoria(input);
+  if (error) return { error };
 
   try {
-    await crearCategoria({ nombre, slug, imagenUrl, mililitrosDisponibles });
+    await crearCategoria(input);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "No se pudo crear la categoría." };
   }
@@ -42,6 +59,46 @@ export async function crearCategoriaAction(
   revalidatePath("/catalogo");
   revalidatePath("/");
   redirect("/admin/categorias");
+}
+
+export async function actualizarCategoriaAction(
+  id: string,
+  _prevState: EstadoCategoria,
+  formData: FormData
+): Promise<EstadoCategoria> {
+  const input = leerCategoriaFormulario(formData);
+  const error = validarCategoria(input);
+  if (error) return { error };
+
+  try {
+    await actualizarCategoria(id, input);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo guardar la categoría." };
+  }
+
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos");
+  revalidatePath("/admin/productos/nuevo");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  redirect("/admin/categorias");
+}
+
+// Sin redirect a propósito, igual que el toggle y el reorden — se llama
+// desde un botón con confirmación en la propia lista (CategoriasOrdenables),
+// no desde un formulario de página completa.
+export async function eliminarCategoriaAction(id: string): Promise<{ error: string | null }> {
+  try {
+    await eliminarCategoria(id);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo eliminar la categoría." };
+  }
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos");
+  revalidatePath("/admin/productos/nuevo");
+  revalidatePath("/catalogo");
+  revalidatePath("/");
+  return { error: null };
 }
 
 export async function toggleCategoriaAction(id: string) {

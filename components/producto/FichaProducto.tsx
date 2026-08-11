@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Producto } from "@/lib/types";
+import type { Producto, Genero } from "@/lib/types";
 import { precioPorMl, precioListaPorMl, porcentajeDescuento, calcularSena } from "@/lib/precio";
 import { limitaPorStock, stockPorMl } from "@/lib/stock";
 import { useCarrito } from "@/lib/store/carrito";
@@ -11,6 +11,27 @@ import MlSelector from "./MlSelector";
 import PrecioBloque from "./PrecioBloque";
 import { BadgeTipo, BadgeMuestra } from "./Badges";
 import IconoWhatsapp from "@/components/icons/IconoWhatsapp";
+
+const ETIQUETA_GENERO: Record<Genero, string> = {
+  MASCULINO: "Masculino",
+  FEMENINO: "Femenino",
+  UNISEX: "Unisex",
+};
+
+// Además de las notas propias del producto (variables), toda la ficha
+// promete lo mismo sobre la procedencia — no depende de qué se cargó en el
+// admin, así que va fijo acá en vez de ser un campo más por producto.
+const CARACTERISTICAS_FIJAS = ["100% original", "Sellado en caja"];
+
+function BloqueNotas({ titulo, notas }: { titulo: string; notas: string[] }) {
+  if (notas.length === 0) return null;
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-widest text-on-surface-muted mb-1">{titulo}</p>
+      <p className="text-on-surface">{notas.join(", ")}</p>
+    </div>
+  );
+}
 
 export default function FichaProducto({ producto }: { producto: Producto }) {
   const mililitrosOrdenados = useMemo(
@@ -83,19 +104,20 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
 
       <div>
         <p className="text-xs uppercase tracking-widest text-on-surface-muted mb-1">
-          {producto.categoria.nombre}
+          {producto.categoria.nombre} · {ETIQUETA_GENERO[producto.genero]}
         </p>
         <h1 className="font-display text-4xl md:text-5xl text-on-background leading-none">
           {producto.nombre}
         </h1>
       </div>
 
-      {producto.notas && (
-        <div>
-          <p className="text-xs uppercase tracking-widest text-on-surface-muted mb-1">
-            Notas olfativas
-          </p>
-          <p className="text-on-surface">{producto.notas}</p>
+      {(producto.notasSalida.length > 0 ||
+        producto.notasCorazon.length > 0 ||
+        producto.notasFondo.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <BloqueNotas titulo="Notas de salida" notas={producto.notasSalida} />
+          <BloqueNotas titulo="Notas de corazón" notas={producto.notasCorazon} />
+          <BloqueNotas titulo="Notas de fondo" notas={producto.notasFondo} />
         </div>
       )}
 
@@ -185,6 +207,22 @@ export default function FichaProducto({ producto }: { producto: Producto }) {
       {producto.descripcion && (
         <p className="text-on-surface-muted leading-relaxed">{producto.descripcion}</p>
       )}
+
+      <div>
+        <p className="text-xs uppercase tracking-widest text-on-surface-muted mb-2">
+          Características
+        </p>
+        <ul className="flex flex-col gap-1.5">
+          {CARACTERISTICAS_FIJAS.map((c) => (
+            <li key={c} className="flex items-center gap-2 text-sm text-on-surface">
+              <span aria-hidden="true" className="text-accent">
+                ✓
+              </span>
+              {c}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

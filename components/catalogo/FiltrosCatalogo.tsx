@@ -1,8 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { MILILITROS_VALIDOS } from "@/lib/config";
 import type { Categoria } from "@/lib/types";
+
+const ETIQUETA_GENERO: Record<string, string> = {
+  MASCULINO: "Masculino",
+  FEMENINO: "Femenino",
+  UNISEX: "Unisex",
+};
+
+const NIVELES_RELEVANCIA = [
+  { valor: 3, etiqueta: "Alta" },
+  { valor: 2, etiqueta: "Media" },
+  { valor: 1, etiqueta: "Baja" },
+] as const;
 
 export default function FiltrosCatalogo({
   categorias,
@@ -26,22 +39,55 @@ export default function FiltrosCatalogo({
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  // Búsqueda por nombre — se integra al mismo sistema de filtros (misma
+  // URL, mismo `actualizar`), no es una página ni un estado aparte. Con
+  // debounce en vez de por cada tecla: sin esto, cada letra tipeada
+  // dispara una navegación (router.push) y el catálogo entero se vuelve a
+  // pedir al servidor letra por letra.
+  const [busqueda, setBusqueda] = useState(searchParams.get("q") ?? "");
+  useEffect(() => {
+    setBusqueda(searchParams.get("q") ?? "");
+  }, [searchParams]);
+  useEffect(() => {
+    const actual = searchParams.get("q") ?? "";
+    if (busqueda === actual) return;
+    const id = setTimeout(() => actualizar("q", busqueda), 350);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busqueda]);
+
   // `orden` va en la misma lista que el resto: su placeholder es
   // `disabled hidden`, así que si no se puede borrar por acá el cliente queda
   // sin ninguna forma de volver al orden por defecto.
-  const CLAVES_FILTRO = ["categoria", "tipo", "ml", "orden"];
+  const CLAVES_FILTRO = ["categoria", "tipo", "ml", "genero", "relevancia", "orden", "q"];
 
   function limpiarTodo() {
     const params = new URLSearchParams(searchParams.toString());
     for (const clave of CLAVES_FILTRO) params.delete(clave);
     params.delete("pagina");
+    setBusqueda("");
     router.push(`${pathname}?${params.toString()}`);
   }
 
   const categoriaSlug = searchParams.get("categoria") ?? "";
   const tipoActivo = searchParams.get("tipo") ?? "";
   const mlActivo = searchParams.get("ml") ?? "";
+  const generoActivo = searchParams.get("genero") ?? "";
   const ordenActivo = searchParams.get("orden") ?? "";
+  const relevanciaActiva = (searchParams.get("relevancia") ?? "")
+    .split(",")
+    .filter(Boolean)
+    .map(Number);
+
+  function toggleRelevancia(nivel: number) {
+    const set = new Set(relevanciaActiva);
+    if (set.has(nivel)) {
+      set.delete(nivel);
+    } else {
+      set.add(nivel);
+    }
+    actualizar("relevancia", Array.from(set).sort().join(","));
+  }
 
   const chips: { clave: string; etiqueta: string }[] = [];
   if (categoriaSlug) {
@@ -57,11 +103,30 @@ export default function FiltrosCatalogo({
   if (mlActivo) {
     chips.push({ clave: "ml", etiqueta: `${mlActivo} ml` });
   }
+  if (generoActivo) {
+    chips.push({ clave: "genero", etiqueta: ETIQUETA_GENERO[generoActivo] ?? generoActivo });
+  }
+  if (relevanciaActiva.length > 0) {
+    chips.push({
+      clave: "relevancia",
+      etiqueta: `Relevancia: ${relevanciaActiva
+        .map((n) => NIVELES_RELEVANCIA.find((niv) => niv.valor === n)?.etiqueta ?? n)
+        .join(", ")}`,
+    });
+  }
   if (ordenActivo) {
     chips.push({
       clave: "orden",
-      etiqueta: ordenActivo === "precio-asc" ? "Precio ↑" : "Precio ↓",
+      etiqueta:
+        ordenActivo === "precio-asc"
+          ? "Precio ↑"
+          : ordenActivo === "precio-desc"
+            ? "Precio ↓"
+            : "Más relevantes",
     });
+  }
+  if (busqueda) {
+    chips.push({ clave: "q", etiqueta: `"${busqueda}"` });
   }
 
   // text-base en móvil (NO text-xs): por debajo de 16px, Safari iOS hace zoom
@@ -93,105 +158,169 @@ export default function FiltrosCatalogo({
 
   return (
     <div className="py-4 border-b border-border-subtle mb-6">
-    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 items-center">
-      {mostrarCategoria && (
+      <div className="relative mb-2.5">
+        <input
+          type="search"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar por nombre..."
+          aria-label="Buscar producto por nombre"
+          // Mismo criterio de text-base en mobile que el resto de los
+          // controles del filtro (evita el zoom automático de iOS Safari).
+          className="w-full bg-surface border border-border text-on-surface text-base sm:text-sm min-h-11 px-3 rounded-sm focus-visible:outline-accent focus-visible:border-accent hover:border-accent-text transition-colors"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 items-center">
+        {mostrarCategoria && (
+          <div className="relative sm:w-auto">
+            <select
+              aria-label="Filtrar por categoría"
+              className={selectClassName}
+              value={searchParams.get("categoria") ?? ""}
+              onChange={(e) => actualizar("categoria", e.target.value)}
+            >
+              <option value="" disabled hidden>
+                Categoría
+              </option>
+              {categorias.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+        )}
+
         <div className="relative sm:w-auto">
           <select
-            aria-label="Filtrar por categoría"
+            aria-label="Filtrar por tipo"
             className={selectClassName}
-            value={searchParams.get("categoria") ?? ""}
-            onChange={(e) => actualizar("categoria", e.target.value)}
+            value={searchParams.get("tipo") ?? ""}
+            onChange={(e) => actualizar("tipo", e.target.value)}
           >
             <option value="" disabled hidden>
-              Categoría
+              Tipo
             </option>
-            {categorias.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.nombre}
+            <option value="ENCARGO">Por encargo</option>
+            <option value="STOCK">En stock</option>
+          </select>
+          <Chevron />
+        </div>
+
+        <div className="relative sm:w-auto">
+          <select
+            aria-label="Filtrar por tamaño en mililitros"
+            className={selectClassName}
+            value={searchParams.get("ml") ?? ""}
+            onChange={(e) => actualizar("ml", e.target.value)}
+          >
+            <option value="" disabled hidden>
+              Tamaño
+            </option>
+            {MILILITROS_VALIDOS.map((ml) => (
+              <option key={ml} value={ml}>
+                {ml} ml
               </option>
             ))}
           </select>
           <Chevron />
         </div>
-      )}
 
-      <div className="relative sm:w-auto">
-        <select
-          aria-label="Filtrar por tipo"
-          className={selectClassName}
-          value={searchParams.get("tipo") ?? ""}
-          onChange={(e) => actualizar("tipo", e.target.value)}
-        >
-          <option value="" disabled hidden>
-            Tipo
-          </option>
-          <option value="ENCARGO">Por encargo</option>
-          <option value="STOCK">En stock</option>
-        </select>
-        <Chevron />
-      </div>
-
-      <div className="relative sm:w-auto">
-        <select
-          aria-label="Filtrar por tamaño en mililitros"
-          className={selectClassName}
-          value={searchParams.get("ml") ?? ""}
-          onChange={(e) => actualizar("ml", e.target.value)}
-        >
-          <option value="" disabled hidden>
-            Tamaño
-          </option>
-          {MILILITROS_VALIDOS.map((ml) => (
-            <option key={ml} value={ml}>
-              {ml} ml
-            </option>
-          ))}
-        </select>
-        <Chevron />
-      </div>
-
-      <div className="relative sm:w-auto">
-        <select
-          aria-label="Ordenar por"
-          className={selectClassName}
-          value={searchParams.get("orden") ?? ""}
-          onChange={(e) => actualizar("orden", e.target.value)}
-        >
-          <option value="" disabled hidden>
-            Ordenar
-          </option>
-          <option value="precio-asc">Precio: menor a mayor</option>
-          <option value="precio-desc">Precio: mayor a menor</option>
-        </select>
-        <Chevron />
-      </div>
-    </div>
-
-    {chips.length > 0 && (
-      <div className="flex flex-wrap items-center gap-2 mt-3">
-        {chips.map((chip) => (
-          <button
-            key={chip.clave}
-            type="button"
-            onClick={() => actualizar(chip.clave, "")}
-            aria-label={`Quitar filtro ${chip.etiqueta}`}
-            className="flex items-center gap-1.5 h-[28px] pl-3 pr-2.5 text-xs rounded-full border border-accent bg-surface-raised text-on-surface hover:bg-surface transition-colors"
+        <div className="relative sm:w-auto">
+          <select
+            aria-label="Filtrar por género"
+            className={selectClassName}
+            value={generoActivo}
+            onChange={(e) => actualizar("genero", e.target.value)}
           >
-            {chip.etiqueta}
-            <span aria-hidden="true" className="text-accent font-bold">
-              ✕
-            </span>
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={limpiarTodo}
-          className="h-[28px] flex items-center text-xs text-on-surface-muted hover:text-accent underline transition-colors"
-        >
-          Limpiar todo
-        </button>
+            <option value="" disabled hidden>
+              Género
+            </option>
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMENINO">Femenino</option>
+            <option value="UNISEX">Unisex</option>
+          </select>
+          <Chevron />
+        </div>
+
+        <div className="relative sm:w-auto">
+          <select
+            aria-label="Ordenar por"
+            className={selectClassName}
+            value={ordenActivo}
+            onChange={(e) => actualizar("orden", e.target.value)}
+          >
+            <option value="" disabled hidden>
+              Ordenar
+            </option>
+            <option value="relevancia">Más relevantes primero</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+          </select>
+          <Chevron />
+        </div>
+
+        {/* Relevancia es multi-selección (podés querer "alta" + "media" a
+            la vez), por eso no es un <select> como el resto — son chips que
+            se togglean, igual que los filtros ya aplicados de más abajo. */}
+        <div className="col-span-2 sm:col-span-1 flex items-center gap-1.5">
+          <span className="text-xs text-on-surface-muted uppercase tracking-wide mr-0.5">
+            Relevancia:
+          </span>
+          {NIVELES_RELEVANCIA.map((nivel) => {
+            const activo = relevanciaActiva.includes(nivel.valor);
+            return (
+              <button
+                key={nivel.valor}
+                type="button"
+                aria-pressed={activo}
+                onClick={() => toggleRelevancia(nivel.valor)}
+                // min-h-[36px], NO min-h-9: el paso 9 está overrideado a
+                // 128px por la escala custom de globals.css (ver el mismo
+                // comentario en ProductosOrdenables.tsx).
+                className={`min-h-[36px] px-2.5 text-xs border rounded-sm transition-colors ${
+                  activo
+                    ? "border-accent bg-accent text-on-accent"
+                    : "border-border text-on-surface-muted hover:border-accent hover:text-accent"
+                }`}
+              >
+                {nivel.etiqueta}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    )}
+
+      {chips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          {chips.map((chip) => (
+            <button
+              key={chip.clave}
+              type="button"
+              onClick={() => {
+                if (chip.clave === "q") setBusqueda("");
+                actualizar(chip.clave, "");
+              }}
+              aria-label={`Quitar filtro ${chip.etiqueta}`}
+              className="flex items-center gap-1.5 h-[28px] pl-3 pr-2.5 text-xs rounded-full border border-accent bg-surface-raised text-on-surface hover:bg-surface transition-colors"
+            >
+              {chip.etiqueta}
+              <span aria-hidden="true" className="text-accent font-bold">
+                ✕
+              </span>
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={limpiarTodo}
+            className="h-[28px] flex items-center text-xs text-on-surface-muted hover:text-accent underline transition-colors"
+          >
+            Limpiar todo
+          </button>
+        </div>
+      )}
     </div>
   );
 }

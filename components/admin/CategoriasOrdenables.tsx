@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
 import {
   DndContext,
   PointerSensor,
@@ -20,14 +21,20 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { Categoria } from "@/lib/types";
 import IconoArrastre from "@/components/icons/IconoArrastre";
-import { toggleCategoriaAction, reordenarCategoriasAction } from "@/app/admin/categorias/actions";
+import {
+  toggleCategoriaAction,
+  reordenarCategoriasAction,
+  eliminarCategoriaAction,
+} from "@/app/admin/categorias/actions";
 
 function Fila({
   categoria,
   cantidad,
+  onEliminar,
 }: {
   categoria: Categoria;
   cantidad: number;
+  onEliminar: (id: string, nombre: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: categoria.id,
@@ -81,6 +88,19 @@ function Fila({
             {categoria.activa ? "Desactivar" : "Activar"}
           </button>
         </form>
+        <Link
+          href={`/admin/categorias/${categoria.id}`}
+          className="text-on-surface hover:text-accent transition-colors text-sm font-semibold px-2"
+        >
+          Editar
+        </Link>
+        <button
+          type="button"
+          onClick={() => onEliminar(categoria.id, categoria.nombre)}
+          className="text-error font-semibold hover:text-on-accent hover:bg-error px-2 py-1 transition-colors text-sm"
+        >
+          Eliminar
+        </button>
       </div>
     </div>
   );
@@ -108,6 +128,17 @@ export default function CategoriasOrdenables({
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  async function handleEliminar(id: string, nombre: string) {
+    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+    const anterior = categorias;
+    setCategorias((prev) => prev.filter((c) => c.id !== id));
+    const res = await eliminarCategoriaAction(id);
+    if (res.error) {
+      setCategorias(anterior);
+      alert(res.error);
+    }
+  }
 
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e;
@@ -137,7 +168,12 @@ export default function CategoriasOrdenables({
       <SortableContext items={categorias.map((c) => c.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col">
           {categorias.map((cat) => (
-            <Fila key={cat.id} categoria={cat} cantidad={conteoPorCategoria[cat.id] ?? 0} />
+            <Fila
+              key={cat.id}
+              categoria={cat}
+              cantidad={conteoPorCategoria[cat.id] ?? 0}
+              onEliminar={handleEliminar}
+            />
           ))}
         </div>
       </SortableContext>

@@ -37,13 +37,37 @@ export default async function CategoriaPage({
 
   const tipo = sp.tipo === "ENCARGO" || sp.tipo === "STOCK" ? sp.tipo : undefined;
   const ml = typeof sp.ml === "string" && sp.ml ? Number(sp.ml) : undefined;
+  const genero =
+    sp.genero === "MASCULINO" || sp.genero === "FEMENINO" || sp.genero === "UNISEX"
+      ? sp.genero
+      : undefined;
+  const relevancia =
+    typeof sp.relevancia === "string" && sp.relevancia
+      ? (sp.relevancia
+          .split(",")
+          .map(Number)
+          .filter((n): n is 1 | 2 | 3 => n === 1 || n === 2 || n === 3) as (1 | 2 | 3)[])
+      : undefined;
+  const q = typeof sp.q === "string" ? sp.q : undefined;
   const orden =
-    sp.orden === "precio-asc" || sp.orden === "precio-desc" ? sp.orden : "reciente";
+    sp.orden === "precio-asc" || sp.orden === "precio-desc" || sp.orden === "relevancia"
+      ? sp.orden
+      : "reciente";
   const pagina = typeof sp.pagina === "string" ? Math.max(1, Number(sp.pagina) || 1) : 1;
 
   const [categoriasActivas, { productos, total }] = await Promise.all([
     getCategoriasActivas(),
-    getProductos({ categoriaSlug: slug, tipo, ml, orden, pagina, porPagina: POR_PAGINA }),
+    getProductos({
+      categoriaSlug: slug,
+      tipo,
+      ml,
+      genero,
+      relevancia,
+      q,
+      orden,
+      pagina,
+      porPagina: POR_PAGINA,
+    }),
   ]);
 
   // Regla 6: si la categoría no tiene productos activos, sigue existiendo en
@@ -71,6 +95,9 @@ export default async function CategoriaPage({
         searchParams={{
           tipo,
           ml: ml ? String(ml) : undefined,
+          genero,
+          relevancia: relevancia && relevancia.length > 0 ? relevancia.join(",") : undefined,
+          q,
           orden: orden !== "reciente" ? orden : undefined,
         }}
       />
