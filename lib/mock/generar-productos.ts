@@ -1,4 +1,4 @@
-import { MILILITROS_VALIDOS, CATEGORIAS_SEED, DESTACADOS_HOME } from "@/lib/config";
+import { MILILITROS_VALIDOS, CATEGORIAS_SEED } from "@/lib/config";
 import type { Categoria, Producto, TipoProducto } from "@/lib/types";
 
 // Generador determinístico de catálogo mock (Fase 2). Nombres inventados —
@@ -133,10 +133,9 @@ function generarProductosCategoria(
     }
 
     const notas = NOTAS_BASE[i % NOTAS_BASE.length];
-    // i % 7 === 0 ya se usa para "destacado" (evenly-spaced, más abajo se
-    // capa a DESTACADOS_HOME) — la relevancia usa otro módulo para no quedar
-    // pegada 1:1 con destacados. Se sesga hacia 2 (media), como en un
-    // catálogo real donde no todo es "alta" ni "baja".
+    // i % 7 === 0 ya se usa para "destacado" — la relevancia usa otro
+    // módulo para no quedar pegada 1:1 con destacados. Se sesga hacia 2
+    // (media), como en un catálogo real donde no todo es "alta" ni "baja".
     const relevancia: 1 | 2 | 3 = i % 5 === 0 ? 3 : i % 3 === 0 ? 1 : 2;
 
     productos.push({
@@ -206,19 +205,6 @@ export function generarCatalogoMock(): { categorias: Categoria[]; productos: Pro
   productos.forEach((p, i) => {
     p.orden = i;
   });
-
-  // `destacado: i % 7 === 0` de generarProductosCategoria es local a cada
-  // categoría — sumadas las 3 categorías con productos, eso pasa fácil de
-  // DESTACADOS_HOME. No hay un límite real que hacer cumplir (el admin puede
-  // marcar los que quiera), pero el catálogo mock no gana nada con más
-  // destacados de los que el home llega a mostrar, así que se capa acá,
-  // después de juntar todo, en vez de intentar coordinarlo entre categorías.
-  let destacadosVistos = 0;
-  for (const p of productos) {
-    if (!p.destacado) continue;
-    destacadosVistos++;
-    if (destacadosVistos > DESTACADOS_HOME) p.destacado = false;
-  }
 
   return { categorias, productos };
 }

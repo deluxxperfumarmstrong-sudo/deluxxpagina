@@ -150,7 +150,13 @@ export async function getProductoBySlug(slug: string): Promise<Producto | null> 
   return producto as unknown as Producto | null;
 }
 
-export async function getProductosDestacados(cantidad = 8): Promise<Producto[]> {
+// Sin nada marcado como destacado todavía (catálogo recién cargado) — no
+// dejar la sección vacía: cuántos "más recientes" mostrar en su lugar.
+const CANTIDAD_FALLBACK_RECIENTES = 8;
+
+// El home muestra TODOS los productos marcados como destacado, sin tope —
+// cuántos sean es una decisión del admin, no de esta función.
+export async function getProductosDestacados(): Promise<Producto[]> {
   if (USE_MOCK) {
     const { productos } = leerCatalogo();
     // Mismo orden manual que /admin/productos (drag & drop) — así que
@@ -158,12 +164,12 @@ export async function getProductosDestacados(cantidad = 8): Promise<Producto[]> 
     // home, en vez de depender de cuándo se creó cada producto.
     const marcados = productos
       .filter((p) => p.activo && p.destacado)
-      .sort((a, b) => a.orden - b.orden)
-      .slice(0, cantidad);
+      .sort((a, b) => a.orden - b.orden);
     if (marcados.length > 0) return marcados;
-    // Sin nada marcado como destacado todavía (catálogo recién cargado) —
-    // no dejar la sección vacía: caer a los más recientes.
-    const { productos: recientes } = await getProductos({ porPagina: cantidad, orden: "reciente" });
+    const { productos: recientes } = await getProductos({
+      porPagina: CANTIDAD_FALLBACK_RECIENTES,
+      orden: "reciente",
+    });
     return recientes;
   }
 
@@ -171,10 +177,12 @@ export async function getProductosDestacados(cantidad = 8): Promise<Producto[]> 
     where: { activo: true, destacado: true },
     include: { categoria: true },
     orderBy: { orden: "asc" },
-    take: cantidad,
   })) as unknown as Producto[];
   if (destacados.length > 0) return destacados;
-  const { productos: recientes } = await getProductos({ porPagina: cantidad, orden: "reciente" });
+  const { productos: recientes } = await getProductos({
+    porPagina: CANTIDAD_FALLBACK_RECIENTES,
+    orden: "reciente",
+  });
   return recientes;
 }
 

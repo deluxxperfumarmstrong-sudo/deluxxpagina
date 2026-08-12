@@ -16,11 +16,7 @@ export default function DestacadosGrid({ productos }: { productos: Producto[] })
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
         {productos.map((producto, i) => (
-          <Reveal
-            key={producto.id}
-            delayMs={(i % 4) * 70}
-            className={i === 8 ? "hidden md:block" : undefined}
-          >
+          <Reveal key={producto.id} delayMs={(i % 4) * 70}>
             <ProductCard producto={producto} />
           </Reveal>
         ))}
