@@ -10,12 +10,16 @@ export default function Reveal({
   delayMs = 0,
   className = "",
   as: Tag = "div",
+  // Deja pasar los atributos del elemento (aria-labelledby, id, role…). Sin
+  // esto, envolver una <section> en un Reveal le hacía perder su nombre
+  // accesible en silencio: el prop se aceptaba en el JSX y se descartaba.
+  ...resto
 }: {
   children: React.ReactNode;
   delayMs?: number;
   className?: string;
   as?: "div" | "section";
-}) {
+} & React.HTMLAttributes<HTMLElement>) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -61,6 +65,7 @@ export default function Reveal({
 
   return (
     <Tag
+      {...resto}
       ref={ref as React.Ref<HTMLDivElement>}
       className={`transition-[opacity,transform] duration-700 ease-out ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
