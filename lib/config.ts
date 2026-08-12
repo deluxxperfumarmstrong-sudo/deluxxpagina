@@ -40,10 +40,12 @@ export const PAGOS = {
 // misma escala también para decants por simplicidad (ver docs/BLOQUEOS.md).
 export const MILILITROS_VALIDOS = [50, 55, 75, 90, 100, 120, 150, 200] as const;
 
-// Tope de productos "Destacado" — el home solo pide 9 (ver app/page.tsx) y
-// de esos, el 9° queda oculto en mobile (ver DestacadosGrid): un décimo
-// marcado no rompe nada, pero nunca se ve, así que el admin avisa antes.
-export const MAX_DESTACADOS = 9;
+// Cuántos productos "Destacado" muestra el home (ver app/page.tsx) — no es
+// un tope de cuántos productos puede marcar el admin como destacado, esa
+// marca no tiene límite; esto solo recorta cuántos entran en esa sección.
+// De esos 9, el 9° queda oculto en mobile (ver DestacadosGrid) para no
+// dejar una fila de 1 sola columna en la grilla de a 2.
+export const DESTACADOS_HOME = 9;
 
 export const CATEGORIAS_SEED = [
   { nombre: "Árabe", slug: "perfumeria-arabe" },

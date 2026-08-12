@@ -9,13 +9,11 @@ import {
   eliminarProducto,
   reordenarProductos,
   toggleProductoDestacado,
-  contarProductosDestacados,
   getProductoPorId,
   agregarMililitroACategoria,
   type ProductoInput,
 } from "@/lib/data";
 import { validarCoherenciaPreciosMl, validarCoherenciaStockMl } from "@/lib/validacion";
-import { MAX_DESTACADOS } from "@/lib/config";
 import { slugify } from "@/lib/slug";
 import type { TipoProducto, Genero, Relevancia } from "@/lib/types";
 
@@ -130,10 +128,6 @@ export async function crearProductoAction(
   const error = validar(input);
   if (error) return { error };
 
-  if (input.destacado && (await contarProductosDestacados()) >= MAX_DESTACADOS) {
-    return { error: `Ya hay ${MAX_DESTACADOS} productos destacados — sacá uno antes de agregar otro.` };
-  }
-
   try {
     await crearProducto(input);
     // Un tamaño elegido que la categoría todavía no tenía (agregado a mano
@@ -160,13 +154,6 @@ export async function actualizarProductoAction(
   const input = leerFormulario(formData);
   const error = validar(input);
   if (error) return { error };
-
-  if (input.destacado) {
-    const actual = await getProductoPorId(id);
-    if (!actual?.destacado && (await contarProductosDestacados()) >= MAX_DESTACADOS) {
-      return { error: `Ya hay ${MAX_DESTACADOS} productos destacados — sacá uno antes de agregar otro.` };
-    }
-  }
 
   try {
     await actualizarProducto(id, input);
@@ -200,10 +187,6 @@ export async function reordenarProductosAction(idsEnOrden: string[]) {
 export async function toggleProductoDestacadoAction(id: string): Promise<{ error: string | null }> {
   const actual = await getProductoPorId(id);
   if (!actual) return { error: "Producto no encontrado." };
-
-  if (!actual.destacado && (await contarProductosDestacados()) >= MAX_DESTACADOS) {
-    return { error: `Ya hay ${MAX_DESTACADOS} productos destacados — sacá uno antes de agregar otro.` };
-  }
 
   await toggleProductoDestacado(id);
   revalidatePath("/admin/productos");

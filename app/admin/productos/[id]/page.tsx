@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCategoriasAdmin, getProductoPorId, contarProductosDestacados } from "@/lib/data";
+import { getCategoriasAdmin, getProductoPorId } from "@/lib/data";
 import ProductoForm from "../ProductoForm";
 import { actualizarProductoAction } from "../actions";
 
@@ -10,10 +10,9 @@ export default async function EditarProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [categorias, producto, destacadosActuales] = await Promise.all([
+  const [categorias, producto] = await Promise.all([
     getCategoriasAdmin(),
     getProductoPorId(id),
-    contarProductosDestacados(),
   ]);
 
   if (!producto) notFound();
@@ -45,7 +44,6 @@ export default async function EditarProductoPage({
         categorias={categorias}
         producto={producto}
         action={actualizarProductoAction.bind(null, id)}
-        destacadosActuales={destacadosActuales}
       />
     </div>
   );

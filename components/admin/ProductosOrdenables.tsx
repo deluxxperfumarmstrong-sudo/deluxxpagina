@@ -28,7 +28,6 @@ import {
   toggleProductoDestacadoAction,
   actualizarStockAction,
 } from "@/app/admin/productos/actions";
-import { MAX_DESTACADOS } from "@/lib/config";
 import { limitaPorStock } from "@/lib/stock";
 import IconoArrastre from "@/components/icons/IconoArrastre";
 import BotonEliminar from "@/app/admin/productos/BotonEliminar";
@@ -399,9 +398,7 @@ export default function ProductosOrdenables({ productosIniciales }: { productosI
         </select>
         <p className="text-sm text-on-surface-muted sm:ml-auto self-center whitespace-nowrap">
           {filtrados.length} de {productos.length} ·{" "}
-          <span className={cantidadDestacados >= MAX_DESTACADOS ? "text-error" : "text-warning"}>
-            ★ {cantidadDestacados}/{MAX_DESTACADOS} destacados
-          </span>
+          <span className="text-warning">★ {cantidadDestacados} destacados</span>
         </p>
       </div>
 

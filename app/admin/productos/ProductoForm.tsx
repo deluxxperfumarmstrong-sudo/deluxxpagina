@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { MILILITROS_VALIDOS, MAX_DESTACADOS } from "@/lib/config";
+import { MILILITROS_VALIDOS } from "@/lib/config";
 import type { Categoria, Producto } from "@/lib/types";
 import type { EstadoProducto } from "./actions";
 import ImagenesOrdenables from "@/components/admin/ImagenesOrdenables";
@@ -12,16 +12,10 @@ export default function ProductoForm({
   categorias,
   producto,
   action,
-  destacadosActuales,
 }: {
   categorias: Categoria[];
   producto?: Producto;
   action: (prevState: EstadoProducto, formData: FormData) => Promise<EstadoProducto>;
-  // Conteo tomado al cargar la página — no se refresca en vivo (otro admin
-  // podría estar tocando destacados a la vez), pero alcanza para el aviso:
-  // el límite real lo termina de aplicar el usuario mirando el contador de
-  // /admin/productos antes de guardar.
-  destacadosActuales: number;
 }) {
   const [estado, formAction, pendiente] = useActionState(action, ESTADO_INICIAL);
   const [mlSeleccionados, setMlSeleccionados] = useState<number[]>(
@@ -29,8 +23,6 @@ export default function ProductoForm({
   );
   const [categoriaId, setCategoriaId] = useState(producto?.categoriaId ?? "");
   const [destacado, setDestacado] = useState(producto?.destacado ?? false);
-  const yaEraDestacado = producto?.destacado ?? false;
-  const limiteDestacadosAlcanzado = !yaEraDestacado && destacadosActuales >= MAX_DESTACADOS;
 
   // Cada categoría define qué tamaños puede tener un producto suyo (ver
   // CategoriaForm.tsx). Sin categoría elegida, o si es una categoría vieja
@@ -318,31 +310,18 @@ export default function ProductoForm({
         {/* "Destacado" en dorado (warning de design.md) es una excepción
             puntual pedida explícitamente — el resto del sitio se queda en
             gris + rojo, esto no es un segundo acento de uso libre. */}
-        <div className="flex flex-col gap-1">
-          <button
-            type="button"
-            aria-pressed={destacado}
-            disabled={!destacado && limiteDestacadosAlcanzado}
-            title={
-              !destacado && limiteDestacadosAlcanzado
-                ? `Ya hay ${MAX_DESTACADOS} productos destacados — sacá uno antes de agregar otro.`
-                : undefined
-            }
-            onClick={() => setDestacado((v) => !v)}
-            className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-              destacado
-                ? "bg-warning border-warning text-on-primary"
-                : "border-border text-on-surface-muted hover:border-warning hover:text-warning"
-            }`}
-          >
-            <span aria-hidden="true">★</span> Destacado
-          </button>
-          {!destacado && limiteDestacadosAlcanzado && (
-            <p className="text-xs text-error">
-              Ya hay {MAX_DESTACADOS} destacados — sacá uno en /admin/productos antes de agregar otro.
-            </p>
-          )}
-        </div>
+        <button
+          type="button"
+          aria-pressed={destacado}
+          onClick={() => setDestacado((v) => !v)}
+          className={`flex items-center gap-2 text-sm font-semibold px-4 py-2 border transition-colors ${
+            destacado
+              ? "bg-warning border-warning text-on-primary"
+              : "border-border text-on-surface-muted hover:border-warning hover:text-warning"
+          }`}
+        >
+          <span aria-hidden="true">★</span> Destacado
+        </button>
         <input type="hidden" name="destacado" value={destacado ? "on" : ""} />
       </div>
 

@@ -5,11 +5,12 @@ import DestacadosGrid from "@/components/home/DestacadosGrid";
 import BloqueResenas from "@/components/home/BloqueResenas";
 import BloqueEnviosPagos from "@/components/home/BloqueEnviosPagos";
 import { getCategoriasActivas, getProductosDestacados } from "@/lib/data";
+import { DESTACADOS_HOME } from "@/lib/config";
 
 export default async function Home() {
   const [categorias, destacados] = await Promise.all([
     getCategoriasActivas(),
-    getProductosDestacados(9),
+    getProductosDestacados(DESTACADOS_HOME),
   ]);
 
   return (
