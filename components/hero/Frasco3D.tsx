@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerformanceMonitor, RoundedBox, useTexture } from "@react-three/drei";
-import { ClampToEdgeWrapping, type Group } from "three";
+import { ClampToEdgeWrapping, Matrix4, type Group, type InstancedMesh } from "three";
 
 // Frasco rectangular acanalado (referencia: Lattafa "Kingdom"), pero en los
 // grises metálicos de design.md en vez de dorado — nada de un segundo color
@@ -26,36 +26,49 @@ const N_RIBS = 20;
 // origen) encuadra mal y corta la tapa por arriba. Ver <ContenidoCentrado>.
 const CENTRO_Y = 0.22;
 
+// Las 40 canaletas y los 20 studs son, cada grupo, la misma geometría con el
+// mismo material repetida en distintas posiciones — el caso exacto para el que
+// existe InstancedMesh. Antes eran 60 objetos sueltos, o sea 60 draw calls con
+// sus 60 subidas de uniforms por frame, más que todo el resto del frasco
+// junto; ahora son 2 draw calls. En una GPU de escritorio es un ahorro
+// moderado, en un Android de gama media es la diferencia entre alcanzar los
+// 60 fps y no. No cambia un pixel de lo que se ve.
 function Ribs() {
-  const ribs = useMemo(() => {
-    const items: { x: number }[] = [];
+  const ref = useRef<InstancedMesh>(null);
+  const total = N_RIBS * 2;
+
+  useLayoutEffect(() => {
+    const malla = ref.current;
+    if (!malla) return;
+    const m = new Matrix4();
     const margen = 0.06;
     const usable = ANCHO - margen * 2;
-    for (let i = 0; i < N_RIBS; i++) {
-      items.push({ x: -usable / 2 + (usable / (N_RIBS - 1)) * i });
+    let i = 0;
+    // Mismo orden que antes: primero la cara de adelante, después la de atrás.
+    for (const z of [PROFUNDO / 2 + 0.006, -PROFUNDO / 2 - 0.006]) {
+      for (let k = 0; k < N_RIBS; k++) {
+        m.makeTranslation(-usable / 2 + (usable / (N_RIBS - 1)) * k, 0, z);
+        malla.setMatrixAt(i++, m);
+      }
     }
-    return items;
+    malla.instanceMatrix.needsUpdate = true;
   }, []);
 
+  // frustumCulled={false}: la esfera envolvente de un InstancedMesh se calcula
+  // en el primer test de culling, que puede caer antes de que se escriban las
+  // matrices. Al ser una pieza chica de un objeto que siempre está en cámara,
+  // saltear el test es más barato y más seguro que arriesgar un culleo mal
+  // calculado que haga desaparecer las canaletas.
   return (
-    <>
-      {ribs.map((r, i) => (
-        <mesh key={i} position={[r.x, 0, PROFUNDO / 2 + 0.006]}>
-          <boxGeometry args={[0.022, ALTO - 0.1, 0.014]} />
-          <meshStandardMaterial color={GRIS_RIB} metalness={0.85} roughness={0.25} />
-        </mesh>
-      ))}
-      {ribs.map((r, i) => (
-        <mesh key={`b${i}`} position={[r.x, 0, -PROFUNDO / 2 - 0.006]}>
-          <boxGeometry args={[0.022, ALTO - 0.1, 0.014]} />
-          <meshStandardMaterial color={GRIS_RIB} metalness={0.85} roughness={0.25} />
-        </mesh>
-      ))}
-    </>
+    <instancedMesh ref={ref} args={[undefined, undefined, total]} frustumCulled={false}>
+      <boxGeometry args={[0.022, ALTO - 0.1, 0.014]} />
+      <meshStandardMaterial color={GRIS_RIB} metalness={0.85} roughness={0.25} />
+    </instancedMesh>
   );
 }
 
 function Studs() {
+  const ref = useRef<InstancedMesh>(null);
   const posiciones = useMemo(() => {
     const pts: [number, number][] = [];
     const xHalf = ANCHO / 2 - 0.04;
@@ -73,15 +86,29 @@ function Studs() {
     return pts;
   }, []);
 
+  useLayoutEffect(() => {
+    const malla = ref.current;
+    if (!malla) return;
+    const m = new Matrix4();
+    posiciones.forEach(([x, y], i) => {
+      m.makeTranslation(x, y, PROFUNDO / 2 + 0.01);
+      malla.setMatrixAt(i, m);
+    });
+    malla.instanceMatrix.needsUpdate = true;
+  }, [posiciones]);
+
+  // 12x8 segmentos en vez de 16x16: son bolitas de radio 0.028 sobre un frasco
+  // de ancho 1.0, o sea unos 8 px en pantalla. 512 triángulos para 8 px no se
+  // distinguen de 120 ni con la nariz pegada al monitor.
   return (
-    <>
-      {posiciones.map(([x, y], i) => (
-        <mesh key={i} position={[x, y, PROFUNDO / 2 + 0.01]}>
-          <sphereGeometry args={[0.028, 16, 16]} />
-          <meshStandardMaterial color={PLATA} metalness={1} roughness={0.05} />
-        </mesh>
-      ))}
-    </>
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, posiciones.length]}
+      frustumCulled={false}
+    >
+      <sphereGeometry args={[0.028, 12, 8]} />
+      <meshStandardMaterial color={PLATA} metalness={1} roughness={0.05} />
+    </instancedMesh>
   );
 }
 
@@ -189,14 +216,34 @@ function Frasco({ autoRotar }: { autoRotar: boolean }) {
   );
 }
 
+// El dpr con el que conviene arrancar. Ojo con el valor anterior: era un 2
+// literal, no "el dpr del monitor con tope 2" como decía el comentario — y el
+// prop dpr de R3F es la densidad final, no un tope. O sea que en un monitor
+// 1080p común (dpr 1) el frasco se dibujaba a 2x y se bajaba a 1x al
+// componer: 4 veces los píxeles necesarios, con su MSAA encima, tirados a la
+// basura en todas las PCs de pantalla no-retina. Ahora sí es el dpr real,
+// capado a 2, y un escalón más abajo en equipos que se sabe que van justos.
+const DPR_TOPE = 2;
+
+function dprMaximo() {
+  if (typeof window === "undefined") return 1;
+  return Math.min(window.devicePixelRatio || 1, DPR_TOPE);
+}
+
+function dprInicial() {
+  if (typeof window === "undefined") return 1;
+  const max = dprMaximo();
+  const tactil = window.matchMedia("(pointer: coarse)").matches;
+  const nucleos = navigator.hardwareConcurrency || 4;
+  if (tactil || nucleos <= 4) return Math.min(max, 1.5);
+  return max;
+}
+
 export default function Frasco3D({ activo = true }: { activo?: boolean }) {
-  // Arranca en la resolución interna máxima (dpr real del monitor, tope 2)
-  // y PerformanceMonitor la va bajando de a un escalón (2 → 1.5 → 1) solo
-  // si mide que esta PC puntual no llega a un frame rate fluido — nunca
-  // toca la velocidad de la rotación (esa va por delta time, no por fps),
-  // solo la cantidad de píxeles que hay que dibujar por frame. En una PC
-  // sin problemas nunca baja de dpr 2.
-  const [dpr, setDpr] = useState(2);
+  // PerformanceMonitor ajusta de a un escalón de 0.5 según lo que mida en este
+  // equipo puntual — nunca toca la velocidad de la rotación (esa va por delta
+  // time, no por fps), solo la cantidad de píxeles a dibujar por frame.
+  const [dpr, setDpr] = useState(dprInicial);
 
   return (
     <Canvas
@@ -210,8 +257,14 @@ export default function Frasco3D({ activo = true }: { activo?: boolean }) {
       // ni ningún otro movimiento mientras el canvas SÍ está a la vista.
       frameloop={activo ? "always" : "never"}
     >
+      {/* onIncline es la contracara del arranque conservador de dprInicial:
+          si el equipo demuestra que le sobra margen, se le devuelve nitidez
+          hasta el dpr real del monitor. flipflops={2} corta la oscilación —
+          después de dos idas y vueltas se queda en el piso y no mide más. */}
       <PerformanceMonitor
         onDecline={() => setDpr((d) => Math.max(1, d - 0.5))}
+        onIncline={() => setDpr((d) => Math.min(dprMaximo(), d + 0.5))}
+        onFallback={() => setDpr(1)}
         flipflops={2}
       />
       <ambientLight intensity={0.55} />

@@ -98,6 +98,32 @@ Detalles de la integración:
   `design.md`) a pedido del cliente, para que el hero quede en la misma
   familia de grises que el resto del sitio en vez de negro puro.
 
+**Corrección posterior — el shader ya NO está literal (autorizado por el
+cliente).** El hero congelaba la pantalla hasta salir de él, tanto en
+algunas PCs de escritorio como en Android. La causa medida: la `palette()`
+del preset original mezclaba las 8 paradas en OKLab **en vivo, por pixel**,
+encadenando 7 `mixColour()` de ~15 `pow()` cada uno; y como `u_finish.z`
+(blur) es 0.016, `main()` pedía 5 muestras de color por pixel. Total ~525
+`pow()` por pixel por frame. Medido en la iGPU AMD de desarrollo: **10,89
+ms/frame a 1080p con dpr 1** — a dpr 2 son ~44 ms, casi tres presupuestos
+de frame enteros solo para el fondo, antes de three.js, React y el scroll.
+
+`palette(x)` es función pura de `x` y de uniforms constantes, así que la
+rampa pasó a calcularse una sola vez en el CPU (`components/hero/paletaLut.ts`,
+port literal de las funciones OKLab que estaban en el shader) y a entrar
+como textura de 1024×1. El shader quedó con un `texture2D()` en lugar de la
+mezcla. **No es una aproximación:** es la misma mezcla OKLab, tabulada.
+Verificado renderizando ambos shaders con los mismos uniforms y comparando
+los framebuffers a 4 tiempos distintos — diferencia máxima **1 nivel sobre
+255**, promedio 0,06, que es el redondeo de 8 bits y queda muy por debajo
+del grano de ±45/255 que el propio shader agrega encima. Costo: 0,48
+ms/frame, **22,8× más rápido**.
+
+`u_colors[8]` desapareció como uniform (los colores ahora alimentan la
+tabla) y `u_oklab`/`u_colorCount` quedaron como `#define` sin lector: la
+decisión de mezclar en OKLab se toma al construir la tabla. Los valores del
+§5 del PRD no cambiaron: el resultado en pantalla es el mismo.
+
 **Verificación visual pendiente:** el navegador de esta sesión no pudo
 tomar una captura de pantalla real (el panel no está desplegado en pantalla
 durante el build automático), así que todo lo de arriba se validó

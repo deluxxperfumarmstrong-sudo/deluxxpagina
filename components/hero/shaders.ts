@@ -1,8 +1,15 @@
 // Shader "Plasma" — fuente original del cliente (21st.dev Shader Builder),
-// pegado tal cual sin modificar la lógica, según pide docs/prd.md §5.
-// El re-tinte de marca vive enteramente en los uniforms que le pasa
-// HeroShader.tsx (paleta de 5 colores, u_hue = 0.0, u_oklab = 1.0) — este
-// archivo no se toca para eso.
+// pegado tal cual según pide docs/prd.md §5. El re-tinte de marca vive
+// enteramente en los uniforms que le pasa HeroShader.tsx (u_hue = 0.0,
+// u_oklab = 1.0) — este archivo no se toca para eso.
+//
+// Única desviación del original, y solo de implementación, no de resultado:
+// la función palette() ya no mezcla la rampa en vivo, la lee de una tabla
+// precalculada en el CPU (ver el bloque correspondiente más abajo). Es la
+// misma mezcla OKLab dando los mismos colores — verificado contra la
+// implementación original: máximo 1 nivel de diferencia sobre 255, con un
+// grano de ±45/255 encima. Se hizo porque esa mezcla, corriendo por pixel,
+// era lo que congelaba el hero en GPUs integradas y en Android.
 
 export const VERTEX_SHADER = `
 attribute vec2 a_position;
@@ -18,7 +25,11 @@ precision highp float;
 precision mediump float;
 #endif
 
-uniform vec3 u_colors[8];
+// La rampa de color ya no viaja como 8 colores sueltos: llega resuelta en una
+// textura 1D (ver el bloque de palette más abajo y paletaLut.ts). mediump
+// alcanza y sobra para una tabla RGBA de 8 bits, y está garantizado en todos
+// los dispositivos, a diferencia de highp en el fragment shader.
+uniform mediump sampler2D u_paletteLut;
 uniform vec4 u_scene;      // resolution.xy, time, colour count
 uniform vec4 u_shape;      // scale, intensity, paramA, warp
 uniform vec4 u_surface;    // detail, contrast, brightness, saturation
@@ -105,61 +116,22 @@ float fbm(vec2 p) {
   return v;
 }
 
-// --- OKLab colour mixing (perceptual), gated by u_oklab -----------------------
-vec3 srgbToLinear(vec3 c) {
-  return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)),
-    step(0.04045, c));
-}
-vec3 linearToSrgb(vec3 c) {
-  // max() guards the sRGB branch: out-of-gamut OKLab interpolations can send a
-  // channel negative, and pow(negative, …) is NaN which mix()/step() would
-  // then propagate. The linear branch clips such channels to 0 downstream.
-  return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055,
-    step(0.0031308, c));
-}
-vec3 linToOklab(vec3 c) {
-  float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
-  float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
-  float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
-  l = pow(max(l, 0.0), 1.0 / 3.0);
-  m = pow(max(m, 0.0), 1.0 / 3.0);
-  s = pow(max(s, 0.0), 1.0 / 3.0);
-  return vec3(
-    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s);
-}
-vec3 oklabToLin(vec3 c) {
-  float l = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
-  float m = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
-  float s = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
-  l = l * l * l; m = m * m * m; s = s * s * s;
-  return vec3(
-    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
-    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
-}
-vec3 mixColour(vec3 a, vec3 b, float t) {
-  if (u_oklab > 0.5) {
-    vec3 la = linToOklab(srgbToLinear(a));
-    vec3 lb = linToOklab(srgbToLinear(b));
-    return clamp(linearToSrgb(oklabToLin(mix(la, lb, t))), 0.0, 1.0);
-  }
-  return mix(a, b, t);
-}
-
-// Mix through the recipe colours; x is clamped to 0..1. WebGL1 forbids
-// dynamic uniform indexing in fragment shaders, hence the constant loop.
+// --- Rampa de color: tabla precalculada --------------------------------------
+// Acá vivía la mezcla OKLab (srgbToLinear, linToOklab, oklabToLin,
+// linearToSrgb, mixColour) y una palette() que encadenaba 7 de esas
+// mezclas para recorrer las 8 paradas. Eran ~105 pow() por muestra de
+// color, y como u_blur > 0 hace que main() pida 5 muestras por pixel,
+// daba ~525 pow() por pixel por frame — el motivo real de que el hero
+// congelara la pantalla en GPUs integradas y en Android.
+//
+// Nada de esa cuenta dependía del pixel: palette(x) es función pura de x
+// y de uniforms constantes. Ahora se resuelve una sola vez al iniciar, en el
+// CPU, en paletaLut.ts — que es el port literal de las funciones OKLab que
+// estaban acá — y entra como textura. No es una aproximación de la mezcla
+// perceptual: es la misma mezcla, tabulada. u_oklab sigue existiendo como
+// uniform pero ya no se lee: la decisión se toma al construir la tabla.
 vec3 palette(float x) {
-  float n = max(u_colorCount - 1.0, 1.0);
-  float f = clamp(x, 0.0, 1.0) * n;
-  vec3 col = u_colors[0];
-  for (int i = 0; i < 7; i++) {
-    if (float(i) < n)
-      col = mixColour(col, u_colors[i + 1],
-        smoothstep(0.0, 1.0, clamp(f - float(i), 0.0, 1.0)));
-  }
-  return col;
+  return texture2D(u_paletteLut, vec2(clamp(x, 0.0, 1.0), 0.5)).rgb;
 }
 
 vec3 hueRotate(vec3 col, float a) {
