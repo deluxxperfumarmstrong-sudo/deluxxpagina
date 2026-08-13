@@ -16,8 +16,23 @@ function columnasSegunCantidad(cantidad: number): string {
   return "grid-cols-2 sm:grid-cols-4";
 }
 
+// El atributo `sizes` que le pide cada celda a Cloudinary tiene que
+// coincidir con las clases de arriba — es la misma cuenta de columnas,
+// solo que expresada como ancho de viewport en vez de clases de Tailwind.
+// "sm" es el breakpoint real de la grilla (640px): usar 768 acá, como
+// tenía antes, no correspondía con el CSS real y sobrepedía imagen en el
+// rango 640-768px además del error mayor de mobile.
+function sizesSegunCantidad(cantidad: number): string {
+  if (cantidad <= 1) return "100vw";
+  if (cantidad === 2) return "(max-width: 640px) 100vw, 50vw";
+  if (cantidad === 3) return "(max-width: 640px) 100vw, 33vw";
+  return "(max-width: 640px) 50vw, 25vw";
+}
+
 export default function CategoriasGrid({ categorias }: { categorias: Categoria[] }) {
   if (categorias.length === 0) return null;
+
+  const sizes = sizesSegunCantidad(categorias.length);
 
   return (
     <section className="mx-auto max-w-7xl px-4 md:px-12 py-10 md:py-14">
@@ -32,7 +47,7 @@ export default function CategoriasGrid({ categorias }: { categorias: Categoria[]
               <div className="absolute inset-0 z-0">
                 {/* Fallback color in case the image fails to load or is not found */}
                 <div className="absolute inset-0 bg-surface" />
-                <ImagenCategoria slug={cat.slug} nombre={cat.nombre} imagenUrl={cat.imagenUrl} />
+                <ImagenCategoria slug={cat.slug} nombre={cat.nombre} imagenUrl={cat.imagenUrl} sizes={sizes} />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-500" />
               </div>
 

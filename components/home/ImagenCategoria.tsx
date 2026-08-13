@@ -22,10 +22,21 @@ export default function ImagenCategoria({
   slug,
   nombre,
   imagenUrl,
+  // Sin default a "100vw, 33vw": esta grilla cambia de columnas según
+  // cuántas categorías hay (columnasSegunCantidad en CategoriasGrid), así
+  // que el ancho real de cada celda varía con esa cantidad. El valor fijo
+  // de acá pedía siempre el archivo de ancho completo de pantalla — medido
+  // contra la cuenta real: 153 KB en vez de los 72 KB que corresponden a la
+  // mitad de pantalla que ocupa cada categoría en un celular (grilla de 2
+  // columnas con 4+ categorías), es decir el doble por cada una. CldImage
+  // exige la prop igual, así que sin un valor explícito del llamador esto
+  // rompería en vez de quedar mal calculado en silencio.
+  sizes,
 }: {
   slug: string;
   nombre: string;
   imagenUrl: string | null;
+  sizes: string;
 }) {
   const [error, setError] = useState(false);
 
@@ -36,7 +47,7 @@ export default function ImagenCategoria({
       src={imagenUrl || `deluxx/categorias/${slug}`}
       alt={nombre}
       fill
-      sizes="(max-width: 768px) 100vw, 33vw"
+      sizes={sizes}
       className="object-cover transition-transform duration-700 group-hover:scale-105"
       onError={() => setError(true)}
     />
