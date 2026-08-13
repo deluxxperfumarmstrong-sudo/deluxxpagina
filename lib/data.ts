@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { leerCatalogo, guardarCatalogo } from "@/lib/mock/store-file";
 import type { Categoria, CatalogoFiltros, Producto } from "@/lib/types";
 import { precioDesde } from "@/lib/precio";
+import { eliminarImagenes } from "@/lib/cloudinary";
 
 // Sin DATABASE_URL (Neon aún no conectado — ver docs/BLOQUEOS.md) el sitio
 // sirve el catálogo mock. Con DATABASE_URL presente, consulta Neon vía
@@ -322,9 +323,50 @@ export async function eliminarProducto(id: string): Promise<void> {
     const idx = productos.findIndex((p) => p.id === id);
     if (idx !== -1) productos.splice(idx, 1);
     guardarCatalogo(categorias, productos);
+    // A propósito no se toca Cloudinary en modo mock: es el modo de
+    // desarrollo sin DATABASE_URL, y el catálogo de prueba referencia
+    // public_ids reales. Borrarlos desde una máquina local destruiría
+    // imágenes de producción.
     return;
   }
+
+  // Los public_id hay que leerlos ANTES de borrar la fila; después ya no hay
+  // de dónde sacarlos y la imagen queda huérfana en la biblioteca para
+  // siempre (que es exactamente lo que venía pasando).
+  const producto = await prisma.producto.findUnique({
+    where: { id },
+    select: { imagenes: true },
+  });
+
   await prisma.producto.delete({ where: { id } });
+
+  const imagenes = producto?.imagenes ?? [];
+  if (imagenes.length === 0) return;
+
+  // Antes de borrar de Cloudinary hay que confirmar que nadie más use esas
+  // imágenes: el borrado es irreversible y dejaría a otro producto sin foto.
+  // Se consulta DESPUÉS del delete, así el propio producto ya no figura y no
+  // hace falta excluirlo de la búsqueda. También se miran las categorías:
+  // hoy viven en otra carpeta y la colisión es improbable, pero el chequeo
+  // sale una query y evita destruir un asset en uso.
+  const [enProductos, enCategorias] = await Promise.all([
+    prisma.producto.findMany({
+      where: { imagenes: { hasSome: imagenes } },
+      select: { imagenes: true },
+    }),
+    prisma.categoria.findMany({
+      where: { imagenUrl: { in: imagenes } },
+      select: { imagenUrl: true },
+    }),
+  ]);
+
+  const enUso = new Set([
+    ...enProductos.flatMap((p) => p.imagenes),
+    ...enCategorias.map((c) => c.imagenUrl).filter((u): u is string => !!u),
+  ]);
+  const huerfanas = imagenes.filter((publicId) => !enUso.has(publicId));
+
+  await eliminarImagenes(huerfanas);
 }
 
 export type CategoriaInput = {
