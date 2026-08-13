@@ -94,23 +94,8 @@
   --font-body: var(--font-body);
 }
 
-/* Color de borde por defecto cuando se usa `border` sin especificar color
-   (equivalente al preflight de Tailwind v3). En @layer base — sin esto, al
-   quedar fuera de cualquier @layer, esta regla vivía en el "bucket" sin
-   capa que la cascada de Tailwind v4 siempre prioriza por encima de TODO
-   lo que sí está en capas (@layer base/components/utilities), sin importar
-   especificidad. Eso pisaba en silencio cualquier `border-accent`,
-   `border-accent-text` o `hover:border-*` del sitio entero: medido en vivo,
-   el aviso "envío en el día" de /envios-y-pagos (border-accent) y los
-   botones outline de /soporte, /muestras y /quienes-somos (border-accent-
-   text) renderizaban con el gris de border-subtle en vez del color que
-   pedía su propia clase. En @layer base, las utilidades de Tailwind (que
-   sí están en capas) vuelven a ganarle por el orden normal de capas —
-   mismo patrón que ya usa .chip-tag más abajo en este archivo. */
-@layer base {
-  * {
-    border-color: var(--color-border-subtle);
-  }
+* {
+  border-color: var(--color-border-subtle);
 }
 
 html,

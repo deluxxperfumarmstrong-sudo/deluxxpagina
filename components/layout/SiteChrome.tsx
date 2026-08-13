@@ -6,7 +6,6 @@ import HeaderSpacer from "./HeaderSpacer";
 import Footer from "./Footer";
 import DrawerCarrito from "@/components/carrito/DrawerCarrito";
 import ToastCarrito from "@/components/carrito/ToastCarrito";
-import BotonWhatsappFlotante from "./BotonWhatsappFlotante";
 import type { CategoriaNav } from "@/lib/types";
 
 // El panel de admin tiene su propio layout (app/admin/layout.tsx) — no
@@ -31,7 +30,6 @@ export default function SiteChrome({
       <Footer />
       <DrawerCarrito />
       <ToastCarrito />
-      <BotonWhatsappFlotante />
     </>
   );
 }
