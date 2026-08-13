@@ -63,7 +63,12 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-border-subtle px-4 md:px-12 py-4 text-xs text-on-surface-muted flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-        <span>© {new Date().getFullYear()} Deluxx Perfum. Todos los derechos reservados.</span>
+        <span className="flex flex-wrap items-center gap-x-2">
+          <span>© {new Date().getFullYear()} Deluxx Perfum. Todos los derechos reservados.</span>
+          <Link href="/privacidad" className="underline hover:text-accent">
+            Política de privacidad
+          </Link>
+        </span>
         <span>
           Desarrollado por{" "}
           <a
