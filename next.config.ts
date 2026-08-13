@@ -35,6 +35,11 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: res.cloudinary.com",
               "connect-src 'self' https://api.cloudinary.com",
+              // El mapa de "Dónde estamos" (MapaDiferido) embebe un iframe de
+              // Google Maps bajo demanda. Sin frame-src explícito, CSP cae en
+              // default-src 'self' y lo bloquea silenciosamente (icono de
+              // contenido roto en vez de mapa).
+              "frame-src https://www.google.com",
               // Permitido embeberlo en iframe solo desde el portfolio propio
               // (para la demo "en vivo" de los proyectos) — cualquier otro
               // origen sigue bloqueado, así que la protección contra
