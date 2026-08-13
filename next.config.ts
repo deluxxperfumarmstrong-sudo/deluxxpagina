@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
@@ -36,7 +35,11 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: res.cloudinary.com",
               "connect-src 'self' https://api.cloudinary.com",
-              "frame-ancestors 'none'",
+              // Permitido embeberlo en iframe solo desde el portfolio propio
+              // (para la demo "en vivo" de los proyectos) — cualquier otro
+              // origen sigue bloqueado, así que la protección contra
+              // clickjacking se mantiene para el resto del mundo.
+              "frame-ancestors https://justinosantos.vercel.app",
             ].join("; "),
           },
         ],

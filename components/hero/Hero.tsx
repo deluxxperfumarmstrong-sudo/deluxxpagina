@@ -5,7 +5,14 @@ import { SLOGAN } from "@/lib/config";
 
 export default function Hero() {
   return (
-    <section className="relative h-screen h-svh w-full overflow-hidden">
+    <section
+      className="relative h-screen h-svh w-full overflow-hidden"
+      // HeaderSpacer ahora siempre se renderiza (ver HeaderSpacer.tsx) — acá
+      // se cancela ese espacio para que el hero siga arrancando desde el
+      // borde superior real de la página, con el header flotando
+      // transparente encima, como estaba pensado.
+      style={{ marginTop: "calc(-1 * var(--header-height, 72px))" }}
+    >
       <HeroShader>
         <Frasco3DOverlay />
         {/* Mobile: el bloque de texto arranca justo debajo de la zona del
