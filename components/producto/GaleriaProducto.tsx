@@ -58,13 +58,18 @@ export default function GaleriaProducto({
         )}
       </div>
 
-      {/* Desktop: dos columnas como antes */}
+      {/* Desktop: dos columnas como antes.
+          sizes="25vw" y no "50vw": la galería ya vive dentro de la columna
+          izquierda de la ficha (md:grid-cols-2 en un max-w-6xl), así que
+          cada una de estas dos fotos ocupa un cuarto del ancho de pantalla,
+          no la mitad. Con 50vw el navegador le pedía a Cloudinary un archivo
+          del doble de ancho del que se ve. */}
       <div className="hidden md:grid grid-cols-2 gap-3">
         <div className="relative aspect-[3/4]">
-          <ImagenProducto publicId={foto1} nombre={nombre} className="absolute inset-0" sizes="50vw" />
+          <ImagenProducto publicId={foto1} nombre={nombre} className="absolute inset-0" sizes="25vw" />
         </div>
         <div className="relative aspect-[3/4]">
-          <ImagenProducto publicId={foto2} nombre={nombre} className="absolute inset-0" sizes="50vw" />
+          <ImagenProducto publicId={foto2} nombre={nombre} className="absolute inset-0" sizes="25vw" />
         </div>
       </div>
     </div>

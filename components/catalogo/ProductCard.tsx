@@ -70,7 +70,16 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             publicId={producto.imagenes[0]}
             nombre={producto.nombre}
             className="absolute inset-0"
-            sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 30vw"
+            // El ancho declarado acá es lo que decide qué archivo le pide el
+            // navegador a Cloudinary, y estaba muy por encima del real: decía
+            // 90vw cuando la grilla es de 2 columnas (grid-cols-2), o sea
+            // ~42vw en un celular de 390 px. Medido contra la cuenta real: en
+            // un Android con DPR 3 eso hacía pedir el archivo de 1080 px
+            // (222 KB) en vez del de 640 (85 KB) — 2,6x de más por cada
+            // tarjeta, en la página que más imágenes carga de todo el sitio.
+            // Los valores de ahora salen del layout: 2 columnas hasta 768 px
+            // y 3 en adelante, con el contenedor topeado en max-w-7xl.
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 28vw"
           />
           {/* Apiladas en la misma esquina, no una en cada punta: en una
               tarjeta de ~150px (grilla de 2 columnas en mobile) "Pedido" +
