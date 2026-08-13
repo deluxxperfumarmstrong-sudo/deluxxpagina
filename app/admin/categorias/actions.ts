@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/admin/auth";
 import {
   toggleCategoriaActiva,
   reordenarCategorias,
@@ -43,6 +44,7 @@ export async function crearCategoriaAction(
   _prevState: EstadoCategoria,
   formData: FormData
 ): Promise<EstadoCategoria> {
+  await requireAdmin();
   const input = leerCategoriaFormulario(formData);
   const error = validarCategoria(input);
   if (error) return { error };
@@ -66,6 +68,7 @@ export async function actualizarCategoriaAction(
   _prevState: EstadoCategoria,
   formData: FormData
 ): Promise<EstadoCategoria> {
+  await requireAdmin();
   const input = leerCategoriaFormulario(formData);
   const error = validarCategoria(input);
   if (error) return { error };
@@ -88,6 +91,7 @@ export async function actualizarCategoriaAction(
 // desde un botón con confirmación en la propia lista (CategoriasOrdenables),
 // no desde un formulario de página completa.
 export async function eliminarCategoriaAction(id: string): Promise<{ error: string | null }> {
+  await requireAdmin();
   try {
     await eliminarCategoria(id);
   } catch (e) {
@@ -102,6 +106,7 @@ export async function eliminarCategoriaAction(id: string): Promise<{ error: stri
 }
 
 export async function toggleCategoriaAction(id: string) {
+  await requireAdmin();
   await toggleCategoriaActiva(id);
   revalidatePath("/admin/categorias");
   revalidatePath("/");
@@ -116,6 +121,7 @@ export async function toggleCategoriaAction(id: string) {
 // un drop de drag & drop, no un <form>, y el reorden ya se ve al instante
 // en el cliente.
 export async function reordenarCategoriasAction(idsEnOrden: string[]) {
+  await requireAdmin();
   await reordenarCategorias(idsEnOrden);
   revalidatePath("/admin/categorias");
   revalidatePath("/");

@@ -67,3 +67,17 @@ export function passwordValido(password: string): boolean {
   }
   return diff === 0;
 }
+
+// El middleware ya bloquea la navegación a /admin/**, pero las Server
+// Actions son endpoints POST propios e invocables directamente conociendo su
+// id — hay que tratarlas como si fueran públicas y no confiar solo en que el
+// usuario haya pasado por una página protegida antes de llegar acá. Cada
+// action de escritura en /admin llama esto como primera línea.
+export async function requireAdmin(): Promise<void> {
+  const { cookies } = await import("next/headers");
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_SESION)?.value;
+  if (!(await tokenValido(token))) {
+    throw new Error("No autorizado.");
+  }
+}

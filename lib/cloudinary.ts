@@ -57,10 +57,7 @@ export async function eliminarImagenes(publicIds: string[]): Promise<void> {
         }
       );
       if (!res.ok) {
-        console.error(
-          `Cloudinary: no se pudieron borrar ${lote.length} imagen(es) (HTTP ${res.status}).`,
-          await res.text().catch(() => "")
-        );
+        console.error(`Cloudinary: no se pudieron borrar ${lote.length} imagen(es) (HTTP ${res.status}).`);
       }
     } catch (e) {
       console.error("Cloudinary: falló el borrado de imágenes.", e);

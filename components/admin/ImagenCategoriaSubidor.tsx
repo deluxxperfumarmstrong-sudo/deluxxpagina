@@ -2,11 +2,12 @@
 
 import { useRef, useState } from "react";
 import { CldImage } from "next-cloudinary";
+import { firmarSubidaCloudinary } from "@/lib/admin/cloudinary-firma";
 
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-const CLOUD_NAME_LISTO = !!CLOUD_NAME && CLOUD_NAME !== "dxxxxxx";
-const CLOUDINARY_LISTO = CLOUD_NAME_LISTO && !!UPLOAD_PRESET && UPLOAD_PRESET !== "xxxxxxxx";
+const CLOUD_NAME_LISTO =
+  !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME &&
+  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME !== "dxxxxxx";
+const CLOUDINARY_LISTO = CLOUD_NAME_LISTO;
 
 // Variante de una sola imagen de ImagenesOrdenables.tsx (esa es para las
 // varias fotos de un producto, con reorden) — la imagen de categoría es una
@@ -28,11 +29,15 @@ export default function ImagenCategoriaSubidor({
     setSubiendo(true);
     setErrorSubida(null);
     try {
+      const { timestamp, signature, apiKey, cloudName, folder } =
+        await firmarSubidaCloudinary("deluxx/categorias");
       const form = new FormData();
       form.append("file", archivo);
-      form.append("upload_preset", UPLOAD_PRESET!);
-      form.append("folder", "deluxx/categorias");
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      form.append("api_key", apiKey);
+      form.append("timestamp", String(timestamp));
+      form.append("signature", signature);
+      form.append("folder", folder);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: "POST",
         body: form,
       });
@@ -96,9 +101,9 @@ export default function ImagenCategoriaSubidor({
       ) : (
         <div className="border border-dashed border-border-subtle p-4 flex flex-col gap-3">
           <p className="text-xs text-on-surface-muted leading-relaxed">
-            Falta configurar Cloudinary (<code>NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME</code> y{" "}
-            <code>NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET</code> en <code>.env.local</code>) para subir
-            la imagen desde acá. Mientras tanto, pegá el <code>public_id</code> a mano:
+            Falta configurar Cloudinary (<code>NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME</code> en{" "}
+            <code>.env.local</code>) para subir la imagen desde acá. Mientras tanto, pegá el{" "}
+            <code>public_id</code> a mano:
           </p>
           <div className="flex gap-2">
             <input

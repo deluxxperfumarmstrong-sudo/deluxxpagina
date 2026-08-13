@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/admin/auth";
 import {
   crearProducto,
   actualizarProducto,
@@ -70,6 +71,8 @@ function leerFormulario(formData: FormData): ProductoInput {
     generoValor === "MASCULINO" || generoValor === "FEMENINO" ? generoValor : "UNISEX";
   const relevanciaNum = Number(formData.get("relevancia"));
   const relevancia: Relevancia = relevanciaNum === 1 || relevanciaNum === 3 ? relevanciaNum : 2;
+  const tipoRaw = String(formData.get("tipo") ?? "STOCK");
+  const tipo: TipoProducto = tipoRaw === "ENCARGO" ? "ENCARGO" : "STOCK";
   // Los public_id de Cloudinary llegan como inputs ocultos repetidos
   // "imagenes", en el orden en que quedaron tras arrastrarlos en
   // ImagenesOrdenables — ese orden ES el orden final, no hace falta
@@ -88,7 +91,7 @@ function leerFormulario(formData: FormData): ProductoInput {
     notasFondo,
     genero,
     relevancia,
-    tipo: (formData.get("tipo") as TipoProducto) ?? "STOCK",
+    tipo,
     precios,
     preciosDescuento,
     mililitros,
@@ -124,6 +127,7 @@ export async function crearProductoAction(
   _prevState: EstadoProducto,
   formData: FormData
 ): Promise<EstadoProducto> {
+  await requireAdmin();
   const input = leerFormulario(formData);
   const error = validar(input);
   if (error) return { error };
@@ -151,6 +155,7 @@ export async function actualizarProductoAction(
   _prevState: EstadoProducto,
   formData: FormData
 ): Promise<EstadoProducto> {
+  await requireAdmin();
   const input = leerFormulario(formData);
   const error = validar(input);
   if (error) return { error };
@@ -177,6 +182,7 @@ export async function actualizarProductoAction(
 // scroll, parpadea). El reorden ya se ve al instante en el cliente
 // (estado local de ProductosOrdenables); esto solo persiste la verdad.
 export async function reordenarProductosAction(idsEnOrden: string[]) {
+  await requireAdmin();
   await reordenarProductos(idsEnOrden);
   revalidatePath("/admin/productos");
 }
@@ -185,6 +191,7 @@ export async function reordenarProductosAction(idsEnOrden: string[]) {
 // no hace redirect(): es un click sobre una fila, no un <form>, y perder el
 // scroll/estado de filtros en cada click sería peor experiencia.
 export async function toggleProductoDestacadoAction(id: string): Promise<{ error: string | null }> {
+  await requireAdmin();
   const actual = await getProductoPorId(id);
   if (!actual) return { error: "Producto no encontrado." };
 
@@ -202,6 +209,7 @@ export async function toggleProductoDestacadoAction(id: string): Promise<{ error
 export async function actualizarStockAction(
   cambios: { id: string; slug: string; stock: Record<string, number> }[]
 ): Promise<{ error: string | null }> {
+  await requireAdmin();
   if (cambios.length === 0) return { error: null };
 
   for (const cambio of cambios) {
@@ -228,6 +236,7 @@ export async function actualizarStockAction(
 }
 
 export async function eliminarProductoAction(id: string) {
+  await requireAdmin();
   await eliminarProducto(id);
   revalidatePath("/admin/productos");
   revalidatePath("/catalogo");

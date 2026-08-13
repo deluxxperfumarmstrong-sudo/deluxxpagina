@@ -14,6 +14,42 @@ const nextConfig: NextConfig = {
     // corresponden a un slot real de esta interfaz.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
   },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              // Next.js dev usa eval() para Fast Refresh — 'unsafe-eval' solo
+              // en desarrollo, nunca en el build de producción.
+              `script-src 'self' 'unsafe-inline'${
+                process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"
+              }`,
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: res.cloudinary.com",
+              "connect-src 'self' https://api.cloudinary.com",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
+        ],
+      },
+      {
+        // El panel de admin no debe quedar cacheado en el navegador ni en
+        // proxies intermedios — muestra stock y precios que cambian seguido,
+        // y es contenido detrás de sesión.
+        source: "/admin/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store, no-cache, must-revalidate, private" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
